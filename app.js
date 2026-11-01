@@ -38,6 +38,8 @@
   let target = "", segments = [], typed = "";
   let total = 0, correctKeys = 0, startTime = 0, tick = null, running = false, finished = false;
   let lastPick = -1;
+  let samples = [], lastSampleSec = 0, errSince = 0;
+  const reduceMotion = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   function pickRandom(list) {
@@ -186,10 +188,11 @@
   function reset() {
     clearInterval(tick); tick = null; running = false; finished = false;
     typed = ""; total = 0; correctKeys = 0; startTime = 0; input.value = "";
+    samples = []; lastSampleSec = 0; errSince = 0;
     setTarget(cfg.mode === "time" ? buildTimeMode() : buildPassageMode());
     render(); wordsEl.style.transform = ""; placeCaret();
     timerEl.textContent = cfg.mode === "time" ? fa(cfg.time) : ""; liveWpmEl.textContent = "";
-    $("result").classList.add("hidden"); $("test").classList.remove("hidden");
+    showView("test");
     wrap.classList.remove("typing");
     focusInput();
   }
@@ -204,9 +207,18 @@
         if (t >= cfg.time) finish();
       } else timerEl.textContent = fa(Math.floor(t));
       liveWpmEl.textContent = fa(wpm(t)) + " ک/د";
+      sample(t);
     }, 200);
   }
 
+  // نمونه‌برداری ثانیه‌به‌ثانیه برای نمودار
+  function sample(t) {
+    while (lastSampleSec + 1 <= t) {
+      lastSampleSec++;
+      samples.push({ s: lastSampleSec, wpm: wpm(lastSampleSec), raw: Math.round((typed.length / 5) / (lastSampleSec / 60)), err: errSince });
+      errSince = 0;
+    }
+  }
   function onInput() {
     if (finished) { input.value = typed; return; }
     let v = input.value.replace(/\n/g, "");
@@ -215,7 +227,7 @@
     const old = typed;
     // شمارش ضربه‌ها برای دقت
     if (v.length > old.length) {
-      for (let i = old.length; i < v.length; i++) { total++; if (matches(target[i], v[i])) correctKeys++; }
+      for (let i = old.length; i < v.length; i++) { total++; if (matches(target[i], v[i])) correctKeys++; else errSince++; }
     }
     typed = v; input.value = v;
     let a = 0; while (a < old.length && a < v.length && old[a] === v[a]) a++;
@@ -234,8 +246,10 @@
     finished = true; running = false; clearInterval(tick);
     const sec = cfg.mode === "time" ? Math.min(elapsed(), cfg.time) : elapsed();
     const acc = total ? Math.round((correctKeys / total) * 100) : 0;
-    $("rWpm").textContent = fa(wpm(sec));
-    $("rAcc").textContent = "٪" + fa(acc);
+    sample(sec);
+    if (sec - lastSampleSec > .3 || !samples.length) samples.push({ s: sec, wpm: wpm(sec), raw: Math.round((typed.length / 5) / (Math.max(sec, .001) / 60)), err: errSince });
+    countUp($("rWpm"), wpm(sec), "");
+    countUp($("rAcc"), acc, "٪");
     $("rChars").textContent = fa(correctChars()) + " / " + fa(typed.length - correctChars());
     $("rTime").textContent = fa(Math.round(sec)) + " ثانیه";
     $("rMode").textContent = cfg.mode === "time" ? "زمان " + fa(cfg.time) : { short: "متن کوتاه", medium: "متن متوسط", long: "متن بلند" }[cfg.len];
@@ -247,10 +261,50 @@
       const w = document.createElement("div"); w.className = "who"; w.textContent = "— " + s.p.author + "، " + s.p.source;
       d.append(q, w); $("attrib").appendChild(d);
     });
-    $("test").classList.add("hidden"); $("result").classList.remove("hidden");
+    showView("result");
+    drawChart();
     window.__lastResult = { wpm: wpm(sec), acc, correct: correctChars(), typed: typed.length, sec };
   }
 
+  // جابه‌جایی نرم بین صفحهٔ تایپ و کارنامه
+  function showView(name) {
+    const on = $(name), off = $(name === "test" ? "result" : "test");
+    off.classList.add("hidden"); off.classList.remove("enter");
+    if (!on.classList.contains("hidden")) return;
+    on.classList.remove("hidden"); on.classList.remove("enter"); void on.offsetWidth; on.classList.add("enter");
+  }
+  // شمارش متحرک آمار
+  function countUp(el, to, prefix) {
+    const done = () => { el.textContent = prefix + fa(to); };
+    if (reduceMotion() || to <= 0) return done();
+    const t0 = performance.now(), D = 900;
+    (function step(now) {
+      const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = prefix + fa(Math.round(to * e));
+      if (k < 1) requestAnimationFrame(step); else done();
+    })(t0);
+    setTimeout(done, D + 100); // اگر زبانه پنهان باشد
+  }
+  // نمودار سرعت (SVG)
+  function drawChart() {
+    const svg = $("chart"), wrapC = svg.parentElement;
+    const pts = samples.filter(p => p.s > 0);
+    if (pts.length < 2) { wrapC.classList.add("hidden"); return; }
+    wrapC.classList.remove("hidden");
+    const Wc = 600, Hc = 170, pl = 34, pr = 10, pt = 12, pb = 24;
+    const maxS = pts[pts.length - 1].s, maxV = Math.max(10, ...pts.map(p => Math.max(p.wpm, p.raw))) * 1.15;
+    const X = s => pl + (s - pts[0].s) / (maxS - pts[0].s || 1) * (Wc - pl - pr);
+    const Y = v => pt + (1 - v / maxV) * (Hc - pt - pb);
+    const line = k => pts.map((p, i) => (i ? "L" : "M") + X(p.s).toFixed(1) + " " + Y(p[k]).toFixed(1)).join(" ");
+    const area = line("wpm") + ` L${X(maxS).toFixed(1)} ${Hc - pb} L${X(pts[0].s).toFixed(1)} ${Hc - pb} Z`;
+    let grid = "";
+    for (let i = 0; i <= 3; i++) { const v = maxV / 1.15 * i / 3, y = Y(v); grid += `<line x1="${pl}" x2="${Wc - pr}" y1="${y}" y2="${y}" class="g"/><text x="${pl - 6}" y="${y + 4}" class="ax" text-anchor="end">${fa(Math.round(v))}</text>`; }
+    const step = Math.max(1, Math.ceil(pts.length / 8));
+    pts.forEach((p, i) => { if (i % step === 0 || i === pts.length - 1) grid += `<text x="${X(p.s)}" y="${Hc - 6}" class="ax" text-anchor="middle">${fa(Math.round(p.s))}</text>`; });
+    const errs = pts.filter(p => p.err).map(p => `<circle cx="${X(p.s)}" cy="${Y(p.wpm)}" r="${Math.min(7, 3 + p.err)}" class="e"/>`).join("");
+    svg.innerHTML = `<defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9c46a" stop-opacity=".35"/><stop offset="1" stop-color="#e9c46a" stop-opacity="0"/></linearGradient></defs>
+      ${grid}<path d="${area}" fill="url(#ga)" class="ar"/><path d="${line("raw")}" class="r"/><path d="${line("wpm")}" class="w" pathLength="1"/>${errs}`;
+  }
   function focusInput() { input.focus({ preventScroll: true }); wrap.classList.remove("blurred"); }
   input.addEventListener("blur", () => wrap.classList.add("blurred"));
   input.addEventListener("focus", () => wrap.classList.remove("blurred"));

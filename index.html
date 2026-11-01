@@ -2,20 +2,27 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>تایپ پارسی | تمرین تایپ با ادبیات فارسی</title>
+<meta name="description" content="تمرین تایپ فارسی با گزیده‌هایی از حافظ، سعدی، فردوسی، مولوی، خیام و دیگران">
+<meta name="theme-color" content="#05070f">
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/Vazirmatn-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="style.css">
-<meta name="theme-color" content="#1f3a7a">
-<link rel="icon" href="assets/rosette.svg" type="image/svg+xml">
 </head>
 <body>
+<div class="bg" aria-hidden="true">
+  <div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div>
+  <canvas id="bgCanvas"></canvas>
+  <div class="vignette"></div>
+</div>
+
 <header>
-  <div class="brand">
-    <img class="emblem" src="assets/faravahar.svg" alt="" aria-hidden="true">
-    <div class="cartouche"><h1 class="logo">تایپ <span>پارسی</span></h1></div>
-    <div class="tagline">تمرین تایپ با گنجینهٔ ادب پارسی</div>
-  </div>
-  <nav id="config">
+  <a class="brand" href="./" aria-label="تایپ پارسی">
+    <img class="mark" src="assets/mark.svg" alt="" width="40" height="40">
+    <span class="logo">تایپ <b>پارسی</b></span>
+  </a>
+  <nav id="config" aria-label="تنظیمات">
     <div class="group" id="modeGroup">
       <button data-mode="time" class="active">زمان</button>
       <button data-mode="passage">متن</button>
@@ -35,52 +42,51 @@
 </header>
 
 <main>
-  <section id="test">
-    <img class="column col-r" src="assets/column.svg" alt="" aria-hidden="true">
-    <img class="column col-l" src="assets/column.svg" alt="" aria-hidden="true">
-    <div class="crown" aria-hidden="true"></div>
-    <div class="frame">
-    <div class="frieze-lions" aria-hidden="true"></div>
-    <div class="panel">
-    <div id="liveStats"><span id="timer"></span><span id="liveWpm"></span></div>
-    <div id="wordsWrap">
-      <div id="focusHint">برای شروع، روی متن بزنید یا تایپ کنید</div>
-      <textarea id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" dir="rtl" inputmode="text" enterkeyhint="go" aria-label="ورودی تایپ"></textarea>
-      <div id="words"></div>
+  <section id="test" class="view">
+    <div class="card typing-card">
+      <div id="liveStats">
+        <span class="stat"><span id="timer"></span></span>
+        <span class="stat sub"><span id="liveWpm"></span></span>
+      </div>
+      <div id="wordsWrap">
+        <div id="focusHint"><span>برای شروع، روی متن بزنید یا تایپ کنید</span></div>
+        <textarea id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" dir="rtl" inputmode="text" enterkeyhint="go" aria-label="ورودی تایپ"></textarea>
+        <div id="words"></div>
+      </div>
     </div>
-    </div>
-    <div class="frieze-rosettes" aria-hidden="true"></div>
-    </div>
-    <button id="restartBtn" title="شروع دوباره (Tab)">↻</button>
+    <button id="restartBtn" class="icon-btn" title="شروع دوباره (Tab)" aria-label="شروع دوباره">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
   </section>
 
-  <section id="result" class="hidden">
-    <div class="crown" aria-hidden="true"></div>
-    <div class="tablet">
-    <img class="medallion" src="assets/senmurv.svg" alt="" aria-hidden="true">
-    <h2 class="rtitle">کارنامه</h2>
-    <div class="bigstats">
-      <div><div class="label">سرعت (کلمه در دقیقه)</div><div class="val" id="rWpm"></div></div>
-      <div><div class="label">دقت</div><div class="val" id="rAcc"></div></div>
-    </div>
-    <div class="smallstats">
-      <div><span class="label">نویسه‌ها</span><span id="rChars"></span></div>
-      <div><span class="label">زمان</span><span id="rTime"></span></div>
-      <div><span class="label">حالت</span><span id="rMode"></span></div>
-    </div>
-    <div class="pearls" aria-hidden="true"></div>
-    <div id="attrib"></div>
-    <button id="againBtn">↻ دوباره</button>
+  <section id="result" class="view hidden">
+    <div class="card result-card">
+      <div class="rtop">
+        <div class="big"><div class="label">سرعت</div><div class="val" id="rWpm">۰</div><div class="unit">کلمه در دقیقه</div></div>
+        <div class="big"><div class="label">دقت</div><div class="val" id="rAcc">۰</div><div class="unit">درصد</div></div>
+        <div class="chartWrap"><svg id="chart" viewBox="0 0 600 170" preserveAspectRatio="none" aria-label="نمودار سرعت"></svg><div class="legend"><i class="lw"></i> سرعت <i class="lr"></i> خام <i class="le"></i> خطا</div></div>
+      </div>
+      <div class="chips">
+        <div class="chip"><span class="label">درست / غلط</span><span id="rChars"></span></div>
+        <div class="chip"><span class="label">زمان</span><span id="rTime"></span></div>
+        <div class="chip"><span class="label">حالت</span><span id="rMode"></span></div>
+      </div>
+      <div class="attrib-title">آنچه تایپ کردید</div>
+      <div id="attrib"></div>
+      <button id="againBtn" class="primary">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        دوباره
+      </button>
     </div>
   </section>
 </main>
 
 <footer>
-  <div class="pearls" aria-hidden="true"></div>
-  <div class="keys"><kbd>Tab</kbd> یا <kbd>Enter</kbd> برای شروع دوباره · <kbd>Esc</kbd> برای توقف</div>
-  <div class="note">متن‌ها از گنجینهٔ ادب فارسی؛ حافظ، سعدی، فردوسی، مولوی، خیام و دیگران</div>
+  <div class="keys"><kbd>Tab</kbd> یا <kbd>Enter</kbd> شروع دوباره <span class="dot"></span> <kbd>Esc</kbd> پایان</div>
+  <div class="note">گزیده‌هایی از حافظ، سعدی، فردوسی، مولوی، خیام و دیگران</div>
 </footer>
 <script src="texts.js"></script>
 <script src="app.js"></script>
+<script src="bg.js" defer></script>
 </body>
 </html>
