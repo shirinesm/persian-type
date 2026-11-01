@@ -13,14 +13,28 @@
       .replace(/[\u200D\u200F\u200E]/g, "")
       .replace(/\s+/g, " ").trim();
   }
+  // معادل‌های پذیرفتنی هنگام تایپ فارسی (کیبورد عربی، ویرگول لاتین و ...)
+  const FA_EQ = { "\u064A": "ی", "\u0649": "ی", "\u0643": "ک", "\u0629": "ه", ",": "،", ";": "؛", "?": "؟" };
   function normChar(c) {
-    if (c === "\u064A" || c === "\u0649") return "ی";
-    if (c === "\u0643") return "ک";
-    if (c === "\u0629") return "ه";
+    if (FA_EQ[c]) return FA_EQ[c];
+    const d = "0123456789".indexOf(c); if (d >= 0) return FA_DIGITS[d];
+    const a = "٠١٢٣٤٥٦٧٨٩".indexOf(c); if (a >= 0) return FA_DIGITS[a];
     return c;
+  }
+  // پاک‌سازی متنِ واردشده: نویسه‌های نامرئی جهت‌دهی (RLM/LRM/...)، ZWJ و BOM حذف می‌شوند،
+  // انواع فاصله (NBSP و ...) به فاصلهٔ معمولی تبدیل می‌شوند و شکل‌های نمایشی عربی (FB50–FEFF) به حرف پایه.
+  function cleanTyped(s) {
+    s = s.replace(/[\r\n\t]/g, "")
+      .replace(/[\u00A0\u2000-\u200A\u202F\u205F\u3000]/g, " ")
+      .replace(/[\u200B\u200D\u200E\u200F\u061C\u202A-\u202E\u2066-\u2069\uFEFF\u00AD]/g, "")
+      .replace(/[\uFB50-\uFDFF\uFE70-\uFEFC]/g, c => c.normalize("NFKC"));
+    try { s = s.normalize("NFC"); } catch (e) {}
+    return s;
   }
   // نیم‌فاصله را با نیم‌فاصله یا فاصله می‌پذیریم (بسیاری از صفحه‌کلیدها نیم‌فاصله ندارند)
   function matches(expected, typed) {
+    if (expected === typed) return true;
+    if (typed === undefined) return false;
     if (lang === "en") return enCanon(expected) === enCanon(typed);
     typed = normChar(typed);
     if (expected === ZWNJ) return typed === ZWNJ || typed === " ";
@@ -42,7 +56,9 @@
       keys: '<kbd>Tab</kbd> یا <kbd>Enter</kbd> شروع دوباره <span class="dot"></span> <kbd>Esc</kbd> پایان',
       note: "گزیده‌هایی از حافظ، سعدی، فردوسی، مولوی، خیام و دیگران",
       liveWpm: "ک/د", sec: " ثانیه", pct: "٪", modeTime: "زمان ", lens: { short: "متن کوتاه", medium: "متن متوسط", long: "متن بلند" },
-      q: ["«", "»"], sepWho: "، "
+      q: ["«", "»"], sepWho: "، ",
+      kbWrong: "⌨️ صفحه‌کلید روی <b>انگلیسی</b> است؛ آن را <b>فارسی</b> کنید <span>(گوشی: دکمهٔ 🌐 · رایانه: <bdi dir=ltr>Alt+Shift</bdi> یا <bdi dir=ltr>⌘+Space</bdi>)</span>",
+      kbRemapped: "⌨️ صفحه‌کلید روی انگلیسی است", caps: "Caps Lock روشن است"
     },
     en: {
       title: "Parsi Type | Typing practice with English literature & philosophy",
@@ -57,15 +73,25 @@
       keys: '<kbd>Tab</kbd> or <kbd>Enter</kbd> restart <span class="dot"></span> <kbd>Esc</kbd> finish',
       note: "Passages from Shakespeare, Austen, Dickens, Melville, Thoreau, Hume, Mill and others",
       liveWpm: "wpm", sec: "s", pct: "%", modeTime: "time ", lens: { short: "short passage", medium: "medium passage", long: "long passage" },
-      q: ["“", "”"], sepWho: ", "
+      q: ["“", "”"], sepWho: ", ",
+      kbWrong: "⌨️ Your keyboard is set to <b>Persian</b>. Switch it to <b>English</b> <span>(phone: 🌐 key · computer: Alt+Shift or ⌘+Space)</span>",
+      kbRemapped: "⌨️ Your keyboard is set to Persian, so keys are being read as English (QWERTY). <span>Switch to English for best results.</span>",
+      caps: "⇪ Caps Lock is on"
     }
   };
   let lang = document.documentElement.lang === "en" ? "en" : "fa";
   const T = () => I18N[lang];
   const num = n => lang === "fa" ? fa(n) : String(n);
   // در انگلیسی، نشانه‌های تایپوگرافیک متن با معادل ساده‌ی صفحه‌کلید هم پذیرفته می‌شوند (و برعکس، برای نقل‌قول‌های هوشمند iOS)
-  const EN_EQ = { "\u2019": "'", "\u2018": "'", "\u02BC": "'", "\u201C": '"', "\u201D": '"', "\u2014": "-", "\u2013": "-", "\u00A0": " " };
-  const enCanon = c => EN_EQ[c] || c;
+  const EN_EQ = { "\u2019": "'", "\u2018": "'", "\u02BC": "'", "\u00B4": "'", "\u201B": "'", "\u2032": "'", "\u201C": '"', "\u201D": '"', "\u201E": '"', "\u00AB": '"', "\u00BB": '"',
+    "\u2014": "-", "\u2013": "-", "\u2012": "-", "\u2010": "-", "\u2011": "-", "\u2212": "-", "\u00A0": " ", "\u066C": "'", "\u060C": ",", "\u061B": ";", "\u061F": "?" };
+  // علامت‌ها یکسان، حرکت‌ها (ë → e) نادیده، و رقم‌های فارسی/عربی = رقم لاتین
+  const enCanon = c => {
+    if (!c) return c;
+    if (EN_EQ[c]) return EN_EQ[c];
+    let d = FA_DIGITS.indexOf(c); if (d < 0) d = "٠١٢٣٤٥٦٧٨٩".indexOf(c); if (d >= 0) return String(d);
+    return c.normalize("NFD").replace(/[\u0300-\u036f]/g, "") || c;
+  };
   const POOLS = {
     fa: PASSAGES.map((p, i) => ({ ...p, id: i, text: normalizeText(p.text) })),
     en: PASSAGES_EN.map((p, i) => ({ ...p, id: i, text: p.text.replace(/\s+/g, " ").trim() }))
@@ -235,13 +261,13 @@
 
   function reset() {
     clearInterval(tick); tick = null; running = false; finished = false;
-    typed = ""; total = 0; correctKeys = 0; startTime = 0; input.value = "";
+    typed = ""; total = 0; correctKeys = 0; startTime = 0; input.value = ""; composing = false; wrongScript = 0; remapped = false;
     samples = []; lastSampleSec = 0; errSince = 0;
     setTarget(cfg.mode === "time" ? buildTimeMode() : buildPassageMode());
     render(); wordsEl.style.transform = ""; placeCaret();
     timerEl.textContent = cfg.mode === "time" ? num(cfg.time) : ""; liveWpmEl.textContent = "";
     showView("test");
-    wrap.classList.remove("typing");
+    wrap.classList.remove("typing"); updateWarn();
     focusInput();
   }
 
@@ -267,21 +293,69 @@
       errSince = 0;
     }
   }
-  function onInput() {
-    if (finished) { input.value = typed; return; }
-    let v = input.value.replace(/\n/g, "");
+  // ---------- ورودی ----------
+  // متنِ textarea منبع حقیقت است: هر بار کل مقدار با متن هدف مقایسه می‌شود (نه فقط آخرین کلید)،
+  // پس جایگزینی کلمه توسط کیبورد گوشی، پیشنهاد کلمه، چسباندن و پاک کردن همه درست حساب می‌شوند.
+  // در حین ترکیب (composition / IME، مثل Gboard یا کیبوردهای پیشنهادگر) مقدار textarea را دست نمی‌زنیم
+  // چون بازنویسی آن کیبورد را به هم می‌ریزد و حروف تکراری یا جابه‌جا وارد می‌شوند.
+  let composing = false;
+  input.addEventListener("compositionstart", () => { composing = true; });
+  input.addEventListener("compositionend", () => { composing = false; setTimeout(() => { onInput(); caretToEnd(); }, 0); });
+
+  // نقشهٔ کلیدهای فیزیکی (QWERTY آمریکایی) برای وقتی که در حالت انگلیسی کیبوردِ سیستم روی فارسی مانده است
+  const US = { Minus: "-_", Equal: "=+", BracketLeft: "[{", BracketRight: "]}", Backslash: "\\|", Semicolon: ";:", Quote: "'\"", Comma: ",<", Period: ".>", Slash: "/?", Backquote: "`~",
+    Digit1: "1!", Digit2: "2@", Digit3: "3#", Digit4: "4$", Digit5: "5%", Digit6: "6^", Digit7: "7&", Digit8: "8*", Digit9: "9(", Digit0: "0)" };
+  const usChar = (code, shift) => {
+    if (/^Key[A-Z]$/.test(code)) { const c = code[3]; return shift ? c : c.toLowerCase(); }
+    return US[code] ? US[code][shift ? 1 : 0] : null;
+  };
+  const isPersianScript = c => /[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(c);
+  const isLatinLetter = c => /[A-Za-z]/.test(c);
+  let lastKey = null, capsOn = false, wrongScript = 0, remapped = false;
+  input.addEventListener("keydown", e => {
+    lastKey = { code: e.code, shift: e.shiftKey, t: performance.now() };
+    if (e.getModifierState) capsOn = e.getModifierState("CapsLock");
+    updateWarn();
+  });
+
+  const warnEl = $("kbWarn");
+  function updateWarn() {
+    if (!warnEl) return;
+    let msg = "";
+    if (wrongScript >= 2) msg = remapped ? T().kbRemapped : T().kbWrong;
+    else if (capsOn && lang === "en" && !finished) msg = T().caps;
+    warnEl.innerHTML = msg;
+    warnEl.classList.toggle("show", !!msg);
+  }
+
+  function onInput(e) {
+    if (finished) { if (!composing) input.value = typed; return; }
+    let v = cleanTyped(input.value);
+    const old = typed;
+    // تشخیص زبانِ اشتباهِ کیبورد از روی نویسه‌های تازه (پیش از هر تبدیل)
+    for (let i = old.length; i < v.length; i++) {
+      const c = v[i];
+      if (lang === "en" ? isPersianScript(c) : isLatinLetter(c)) wrongScript++;
+      else if (lang === "en" ? isLatinLetter(c) : (isPersianScript(c) && !FA_EQ[c] && !"،؛؟".includes(c))) { wrongScript = 0; remapped = false; }
+    }
+    // حالت انگلیسی + کیبورد فارسی روی رایانه: حرفِ فارسیِ تازه را از روی کلید فیزیکی به حرف انگلیسی برمی‌گردانیم
+    if (lang === "en" && !composing && v.length === old.length + 1 && v.startsWith(old) && isPersianScript(v[v.length - 1])) {
+      const k = lastKey && performance.now() - lastKey.t < 1000 ? usChar(lastKey.code, lastKey.shift) : null;
+      if (k) { v = old + k; remapped = true; }
+    }
     if (v.length > target.length) v = v.slice(0, target.length);
     if (!running && v.length) start();
-    const old = typed;
-    // شمارش ضربه‌ها برای دقت
+    // شمارش ضربه‌ها برای دقت + تشخیص زبانِ اشتباهِ کیبورد
     if (v.length > old.length) {
       for (let i = old.length; i < v.length; i++) { total++; if (matches(target[i], v[i])) correctKeys++; else errSince++; }
     }
-    typed = v; input.value = v;
+    typed = v;
+    if (!composing && input.value !== v) input.value = v;   // فقط در صورت نیاز بازنویسی می‌شود
     let a = 0; while (a < old.length && a < v.length && old[a] === v[a]) a++;
     updateRange(a, Math.max(old.length, v.length) + 1);
+    updateWarn();
     wrap.classList.add("typing"); clearTimeout(onInput.t); onInput.t = setTimeout(() => wrap.classList.remove("typing"), 600);
-    caretToEnd();
+    if (!composing) caretToEnd();
     if (cfg.mode === "time" && typed.length > target.length - 150) {
       const next = POOL[Math.floor(Math.random() * POOL.length)];
       appendSegment(next, true); placeCaret();
@@ -362,8 +436,23 @@
   input.addEventListener("focus", () => wrap.classList.remove("blurred"));
   // textarea شفاف روی متن قرار دارد تا لمس متن در موبایل (iOS) مستقیماً صفحه‌کلید را باز کند.
   // نشانگر متنِ textarea همیشه در انتها نگه داشته می‌شود.
-  const caretToEnd = () => { const l = input.value.length; if (input.selectionStart !== l || input.selectionEnd !== l) input.setSelectionRange(l, l); };
-  ["mouseup", "touchend", "focus", "select", "keyup"].forEach(ev => input.addEventListener(ev, () => setTimeout(caretToEnd, 0)));
+  const caretToEnd = () => { if (composing) return; const l = input.value.length; if (input.selectionStart !== l || input.selectionEnd !== l) input.setSelectionRange(l, l); };
+  // («select» عمداً اینجا نیست: اگر کیبورد یا مرورگر بخشی از متن را برای جایگزینی انتخاب کند، نباید آن را به هم بزنیم)
+  ["mouseup", "touchend", "focus", "keyup"].forEach(ev => input.addEventListener(ev, () => setTimeout(caretToEnd, 0)));
+  // اگر نشانگرِ textarea به هر دلیلی وسط متن باشد (لمس روی متن در آیفون، کشیدن روی فاصله، کلیک)،
+  // تایپ و پاک کردن همیشه در انتهای متن انجام می‌شود؛ وگرنه حروف وسط متن درج می‌شوند و همهٔ ادامه غلط دیده می‌شود.
+  input.addEventListener("beforeinput", e => {
+    if (finished || composing || e.isComposing) return;
+    const v = input.value, L = v.length, a = input.selectionStart, b = input.selectionEnd;
+    if (a !== b || a === L || !e.cancelable) return;   // انتخابِ واقعی یا نشانگر در انتها: رفتار عادی
+    const t = e.inputType;
+    if (t === "insertText" && e.data != null) { e.preventDefault(); input.value = v + e.data; }
+    else if (t === "deleteContentBackward") { e.preventDefault(); input.value = v.slice(0, -1); }
+    else if (t === "deleteWordBackward") { e.preventDefault(); input.value = v.replace(/\S*\s*$/, ""); }
+    else if (t === "deleteContentForward" || t === "deleteWordForward") { e.preventDefault(); return; }
+    else return;
+    caretToEnd(); onInput();
+  });
   window.addEventListener("resize", () => placeCaret());
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => placeCaret());
   input.addEventListener("input", onInput);

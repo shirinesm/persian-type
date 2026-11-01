@@ -80,9 +80,10 @@ if(!en)sc.querySelectorAll("[data-src]").forEach(function(i){i.src=i.getAttribut
         <span class="stat"><span id="timer"></span></span>
         <span class="stat sub"><span id="liveWpm"></span></span>
       </div>
+      <div id="kbWarn" role="status" aria-live="polite"></div>
       <div id="wordsWrap">
         <div id="focusHint"><span data-i18n="hint">برای شروع، روی متن بزنید یا تایپ کنید</span></div>
-        <textarea id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" dir="rtl" inputmode="text" enterkeyhint="go" aria-label="ورودی تایپ" data-i18n-aria="input"></textarea>
+        <textarea id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" writingsuggestions="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" data-lt-active="false" dir="rtl" inputmode="text" enterkeyhint="go" aria-label="ورودی تایپ" data-i18n-aria="input"></textarea>
         <div id="words"></div>
       </div>
     </div>

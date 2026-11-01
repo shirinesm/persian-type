@@ -156,6 +156,9 @@ main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;
 #wordsWrap.blurred #caret{opacity:0;animation:none}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
 #wordsWrap.blurred #words{filter:blur(6px);opacity:.45}
+#kbWarn{display:none;margin:0 8px 12px;padding:9px 14px;border-radius:12px;font-size:14px;font-weight:700;line-height:1.6;color:#ffd9a0;background:rgba(233,150,60,.14);border:1px solid rgba(233,170,90,.45);box-shadow:0 0 22px rgba(233,150,60,.15)}
+#kbWarn.show{display:block;animation:fadeIn .3s both}
+#kbWarn span{font-weight:500;opacity:.85}
 #focusHint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;opacity:0;pointer-events:none;transition:opacity .3s}
 #focusHint span{font-size:17px;font-weight:700;color:var(--ink);padding:10px 20px;border-radius:999px;background:rgba(10,14,32,.7);border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.4)}
 #wordsWrap.blurred #focusHint{opacity:1}
