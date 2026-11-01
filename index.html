@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تایپ پارسی | تمرین تایپ با ادبیات فارسی</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E⌨️%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<header>
+  <div class="logo">تایپ<span>پارسی</span></div>
+  <nav id="config">
+    <div class="group" id="modeGroup">
+      <button data-mode="time" class="active">زمان</button>
+      <button data-mode="passage">متن</button>
+    </div>
+    <span class="sep"></span>
+    <div class="group" id="timeGroup">
+      <button data-time="15">۱۵</button>
+      <button data-time="30" class="active">۳۰</button>
+      <button data-time="60">۶۰</button>
+    </div>
+    <div class="group hidden" id="lenGroup">
+      <button data-len="short" class="active">کوتاه</button>
+      <button data-len="medium">متوسط</button>
+      <button data-len="long">بلند</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section id="test">
+    <div id="liveStats"><span id="timer"></span><span id="liveWpm"></span></div>
+    <div id="wordsWrap" tabindex="0">
+      <div id="focusHint">برای شروع کلیک کنید یا تایپ کنید</div>
+      <div id="words"></div>
+    </div>
+    <textarea id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" dir="rtl"></textarea>
+    <button id="restartBtn" title="شروع دوباره (Tab)">↻</button>
+  </section>
+
+  <section id="result" class="hidden">
+    <div class="bigstats">
+      <div><div class="label">سرعت (کلمه در دقیقه)</div><div class="val" id="rWpm"></div></div>
+      <div><div class="label">دقت</div><div class="val" id="rAcc"></div></div>
+    </div>
+    <div class="smallstats">
+      <div><span class="label">نویسه‌ها</span><span id="rChars"></span></div>
+      <div><span class="label">زمان</span><span id="rTime"></span></div>
+      <div><span class="label">حالت</span><span id="rMode"></span></div>
+    </div>
+    <div id="attrib"></div>
+    <button id="againBtn">↻ دوباره</button>
+  </section>
+</main>
+
+<footer>
+  <div class="keys"><kbd>Tab</kbd> یا <kbd>Enter</kbd> برای شروع دوباره · <kbd>Esc</kbd> برای توقف</div>
+  <div class="note">متن‌ها از گنجینهٔ ادب فارسی؛ حافظ، سعدی، فردوسی، مولوی، خیام و دیگران</div>
+</footer>
+<script src="texts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
