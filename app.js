@@ -272,6 +272,8 @@
     off.classList.add("hidden"); off.classList.remove("enter");
     if (!on.classList.contains("hidden")) return;
     on.classList.remove("hidden"); on.classList.remove("enter"); void on.offsetWidth; on.classList.add("enter");
+    // پس از پایان انیمیشن کلاس را برمی‌داریم تا blur شیشه‌ای کارت (backdrop-filter) دوباره کار کند
+    on.addEventListener("animationend", function done(e) { if (e.target === on) { on.classList.remove("enter"); on.removeEventListener("animationend", done); } });
   }
   // شمارش متحرک آمار
   function countUp(el, to, prefix) {

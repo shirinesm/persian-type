@@ -13,6 +13,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
+html{background:#03040a}
 body{
   font-family:Vazirmatn,Tahoma,sans-serif;color:var(--ink);
   background:radial-gradient(120% 90% at 50% -10%,#0d1640 0%,var(--bg1) 45%,var(--bg0) 100%) fixed;
@@ -32,7 +33,47 @@ button{font-family:inherit}
 @keyframes drift1{to{transform:translate3d(-18vw,14vh,0) scale(1.15)}}
 @keyframes drift2{to{transform:translate3d(20vw,-12vh,0) scale(1.2)}}
 @keyframes drift3{to{transform:translate3d(-25vw,-10vh,0) scale(.85)}}
-.vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 40%,rgba(0,0,0,.55) 100%)}
+.vignette{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(0,0,0,0) 45%,rgba(0,0,0,.5) 100%)}
+.moon{position:absolute;top:15vh;left:7vw;width:110px;height:110px;border-radius:50%;
+  background:radial-gradient(circle,rgba(251,231,171,.42) 0,rgba(233,196,106,.22) 52%,rgba(233,196,106,0) 53%),radial-gradient(circle,rgba(233,196,106,.18),rgba(233,196,106,0) 70%);animation:glow 9s ease-in-out infinite alternate}
+@keyframes glow{to{opacity:.6;transform:scale(1.06)}}
+/* لایه‌های نگارگری؛ هر لایه با موس کمی جابه‌جا می‌شود (parallax) */
+.px{position:absolute;inset:0;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.p1{transform:translate3d(calc(var(--mx,0) * -10px),calc(var(--my,0) * -6px),0)}
+.p2{transform:translate3d(calc(var(--mx,0) * -18px),calc(var(--my,0) * -10px),0)}
+.p3{transform:translate3d(calc(var(--mx,0) * -14px),calc(var(--my,0) * -4px),0)}
+.p4{transform:translate3d(calc(var(--mx,0) * -24px),calc(var(--my,0) * -6px),0)}
+.p5{transform:translate3d(calc(var(--mx,0) * -36px),calc(var(--my,0) * -8px),0)}
+.px img{display:block;-webkit-user-drag:none;user-select:none}
+/* ابرهای چینی طلایی */
+.cloud{position:absolute;left:0;opacity:.42;will-change:transform;animation:drift linear infinite}
+@keyframes drift{from{transform:translate3d(100vw,0,0)}to{transform:translate3d(-100%,0,0)}}
+.k1{top:7vh;width:330px;animation-duration:150s;animation-delay:-30s}
+.k2{top:33vh;width:210px;animation-duration:115s;animation-delay:-80s;opacity:.28}
+.k3{top:55vh;width:270px;animation-duration:175s;animation-delay:-125s;opacity:.24}
+.k4{top:2vh;width:170px;animation-duration:100s;animation-delay:-62s;opacity:.32}
+/* سیمرغ در پرواز */
+.fly{position:absolute;top:5vh;left:0;width:min(38vw,430px);opacity:.92;will-change:transform;animation:fly 64s linear infinite;animation-delay:-14s}
+@keyframes fly{0%{transform:translate3d(100vw,7vh,0)}35%{transform:translate3d(45vw,-1vh,0)}75%{transform:translate3d(-100%,5vh,0)}100%{transform:translate3d(-100%,5vh,0)}}
+.bob{animation:bob 7s ease-in-out infinite alternate}
+@keyframes bob{from{transform:translateY(-10px) rotate(-2.5deg)}to{transform:translateY(12px) rotate(2deg)}}
+.simurgh{width:100%;filter:drop-shadow(0 0 16px rgba(233,196,106,.28))}
+/* کوه‌های مرجانی دوردست */
+.far{position:absolute;bottom:0;left:-6%;width:112%;height:40vh;object-fit:cover;object-position:50% 100%;opacity:.68;animation:sway 70s ease-in-out infinite alternate}
+@keyframes sway{to{transform:translate3d(4%,0,0)}}
+/* سواران (رستم بر رخش) */
+.ride{position:absolute;left:0;will-change:transform;animation:ride 46s linear infinite}
+.r1{bottom:3vh;width:150px}
+.r2{bottom:7vh;width:104px;opacity:.6;animation-delay:-4.5s;animation-duration:52s}
+@keyframes ride{from{transform:translate3d(100vw,0,0)}to{transform:translate3d(-100%,0,0)}}
+.gallop{width:100%;animation:gallop .66s ease-in-out infinite alternate;transform-origin:50% 90%}
+.r2 .gallop{animation-duration:.6s}
+@keyframes gallop{from{transform:translateY(0) rotate(-1.8deg)}to{transform:translateY(-6px) rotate(1.8deg)}}
+/* صخره‌ها، سرو و درخت شکوفه در گوشه‌ها */
+.near{position:absolute;bottom:-1px;width:min(33vw,500px);animation:breathe 16s ease-in-out infinite alternate}
+.nl{left:-2vw}.nr{right:-2vw;animation-delay:-8s}
+@keyframes breathe{to{transform:translate3d(0,6px,0)}}
+.bg-paused .bg,.bg-paused .bg *{animation-play-state:paused!important}
 header,main,footer{position:relative;z-index:1}
 
 /* ---------- سربرگ ---------- */
@@ -59,7 +100,7 @@ main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;
 .view{width:100%;display:flex;flex-direction:column;align-items:center;gap:22px}
 .view.enter{animation:rise .55s var(--ease) both}
 @keyframes rise{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
-.card{position:relative;width:100%;border-radius:var(--radius);background:linear-gradient(180deg,rgba(20,27,58,.62),rgba(9,12,28,.62));
+.card{position:relative;width:100%;border-radius:var(--radius);background:linear-gradient(180deg,rgba(20,27,58,.7),rgba(9,12,28,.74));
   border:1px solid var(--line);-webkit-backdrop-filter:blur(16px) saturate(130%);backdrop-filter:blur(16px) saturate(130%);
   box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06)}
 .card::before{content:"";position:absolute;top:-1px;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,rgba(246,220,143,.8),transparent)}
@@ -132,7 +173,7 @@ main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;
 .primary:active{transform:scale(.97)}
 
 /* ---------- پانویس ---------- */
-footer{text-align:center;padding:10px 16px 22px;color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:6px}
+footer{text-shadow:0 1px 6px #000,0 0 2px #000;text-align:center;padding:10px 16px 22px;color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:6px}
 kbd{font-family:inherit;font-size:12px;padding:2px 7px;border-radius:6px;border:1px solid var(--line2);background:rgba(255,255,255,.05);color:var(--text2)}
 .dot{display:inline-block;width:3px;height:3px;border-radius:50%;background:var(--muted);vertical-align:middle;margin:0 8px}
 .hidden{display:none!important}
@@ -158,8 +199,19 @@ kbd{font-family:inherit;font-size:12px;padding:2px 7px;border-radius:6px;border:
   .chips{gap:8px} .chip{padding:10px;font-size:15px}
   .chip .label{font-size:11px}
   footer .keys{display:none}
+  .fly{top:50vh;width:58vw}
+  .simurgh{filter:none}
+  .moon{top:auto;bottom:40vh;left:auto;right:8vw;width:70px;height:70px}
+  .far{height:34vh}
+  .near{width:52vw}
+  .r1{width:92px;bottom:31vw}.r2{width:66px;bottom:36vw}
+  .k1{top:2vh;width:200px}.k2{top:47vh;width:140px}.k3{top:60vh;width:170px}.k4{top:70vh;width:120px}
 }
 @media (prefers-reduced-motion:reduce){
+  .bg *{animation:none!important}
+  .fly{transform:translate3d(58vw,6vh,0)}
+  .r1{transform:translate3d(28vw,0,0)}.r2{display:none}
+  .k1{transform:translate3d(6vw,0,0)}.k2{transform:translate3d(70vw,0,0)}.k3{transform:translate3d(20vw,0,0)}.k4{transform:translate3d(55vw,0,0)}
   .aurora,.view.enter,#chart .w,#chart .ar,#chart .e,#caret{animation:none!important}
   #chart .w{stroke-dashoffset:0}
   *{transition-duration:.01ms!important}
