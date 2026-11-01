@@ -78,6 +78,31 @@ button{font-family:inherit}
 .nl{left:-2vw}.nr{right:-2vw;animation-delay:-8s}
 @keyframes breathe{to{transform:translate3d(0,6px,0)}}
 .bg-paused .bg,.bg-paused .bg *{animation-play-state:paused!important}
+/* دو صحنه: با تغییر زبان نرم در هم محو می‌شوند؛ صحنهٔ پنهان پس از محو متوقف می‌شود */
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity 1.2s ease,visibility 0s linear 1.2s}
+.scene.on{opacity:1;visibility:visible;transition:opacity 1.2s ease,visibility 0s}
+.scene.idle,.scene.idle *{animation-play-state:paused!important}
+/* ---------- English scene: Starry-Night homage + folk-art flowers & hummingbirds ---------- */
+.scene-en canvas{position:absolute;inset:0;width:100%;height:100%}
+html[lang=en] footer{text-shadow:0 1px 3px rgba(0,0,0,.9),0 0 12px rgba(4,8,26,.9)}
+.en-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,8,26,.62),rgba(4,8,26,0) 16vh),linear-gradient(0deg,rgba(4,8,26,.55),rgba(4,8,26,0) 12vh),radial-gradient(ellipse 58% 52% at 50% 50%,rgba(4,8,26,.52),rgba(4,8,26,0) 78%)}
+.vil{position:absolute;bottom:0;left:0;width:100%;height:30vh;object-fit:cover;object-position:50% 100%}
+.cyp{position:absolute;bottom:-1vh;left:4vw;height:min(86vh,820px);transform-origin:50% 100%;will-change:transform;animation:cypsway 8s ease-in-out infinite alternate}
+@keyframes cypsway{from{transform:rotate(-1.1deg) skewX(-1.6deg)}to{transform:rotate(1.1deg) skewX(1.6deg)}}
+.flw{position:absolute;bottom:-1vh}
+.fr{right:-1vw;width:min(36vw,560px);animation:breathe 14s ease-in-out infinite alternate}
+.fl{left:-2vw;width:min(19vw,290px);transform:scaleX(-1);animation:breatheM 12s ease-in-out infinite alternate}
+@keyframes breatheM{from{transform:scaleX(-1)}to{transform:scaleX(-1) translate3d(0,6px,0)}}
+.hb{position:absolute;left:0;top:0;width:84px;will-change:transform;animation:hb1 30s linear infinite;
+  --hb1:#1fb59a;--hb2:#0b6e72;--hbt:#e0245e;--hbw:rgba(170,230,220,.8)}
+.h2{width:60px;animation-name:hb2;animation-duration:38s;animation-delay:-17s;--hb1:#4cc46a;--hb2:#1f6e8c;--hbt:#ff8a1f;--hbw:rgba(205,240,210,.75)}
+.hb svg{width:100%;height:auto;display:block;overflow:visible}
+.hbBob{animation:bob 2.6s ease-in-out infinite alternate}
+.wing{transform-origin:52px 38px;transform-box:view-box;animation:flap .08s linear infinite alternate}
+@keyframes flap{to{transform:scaleY(-.5)}}
+@keyframes hb1{0%{transform:translate3d(-12vw,40vh,0)}24%{transform:translate3d(28vw,22vh,0)}31%{transform:translate3d(29vw,23vh,0)}
+  52%{transform:translate3d(72vw,58vh,0)}68%{transform:translate3d(73vw,56vh,0)}82%{transform:translate3d(79vw,54vh,0)}100%{transform:translate3d(112vw,28vh,0)}}
+@keyframes hb2{0%{transform:translate3d(-10vw,72vh,0)}28%{transform:translate3d(13vw,64vh,0)}44%{transform:translate3d(14vw,62vh,0)}100%{transform:translate3d(112vw,12vh,0)}}
 header,main,footer{position:relative;z-index:1}
 
 /* ---------- سربرگ ---------- */
@@ -249,6 +274,7 @@ html[lang=en] .chip{justify-content:space-between}
   .far{height:34vh}
   .near{width:52vw}
   .r1{width:92px;bottom:31vw}.r2{width:66px;bottom:36vw}
+  .vil{height:22vh}.cyp{height:58vh;left:-4vw}.fr{width:60vw}.fl{width:32vw}.hb{width:58px}.h2{width:42px}
   .k1{top:38vh;width:170px}.k2{top:47vh;width:140px}.k3{top:60vh;width:170px}.k4{top:70vh;width:120px}
 }
 @media (prefers-reduced-motion:reduce){
@@ -256,6 +282,7 @@ html[lang=en] .chip{justify-content:space-between}
   .fly{transform:translate3d(58vw,6vh,0)}
   .r1{transform:translate3d(28vw,0,0)}.r2{display:none}
   .k1{transform:translate3d(6vw,0,0)}.k2{transform:translate3d(70vw,0,0)}.k3{transform:translate3d(20vw,0,0)}.k4{transform:translate3d(55vw,0,0)}
+  .h1{transform:translate3d(72vw,56vh,0)}.h2{transform:translate3d(14vw,62vh,0)}
   .aurora,.view.enter,#chart .w,#chart .ar,#chart .e,#caret{animation:none!important}
   #chart .w{stroke-dashoffset:0}
   *{transition-duration:.01ms!important}

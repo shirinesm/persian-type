@@ -19,22 +19,30 @@ if(l==="en")document.title="Parsi Type | Typing practice with English literature
 </head>
 <body>
 <div class="bg" aria-hidden="true">
+<div class="scene scene-fa">
   <div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div>
   <div class="moon"></div>
   <div class="px p1">
-    <img class="cloud k1" src="assets/cloud-1.svg" alt=""><img class="cloud k2" src="assets/cloud-2.svg" alt="">
-    <img class="cloud k3" src="assets/cloud-1.svg" alt=""><img class="cloud k4" src="assets/cloud-2.svg" alt="">
+    <img class="cloud k1" data-src="assets/cloud-1.svg" alt=""><img class="cloud k2" data-src="assets/cloud-2.svg" alt="">
+    <img class="cloud k3" data-src="assets/cloud-1.svg" alt=""><img class="cloud k4" data-src="assets/cloud-2.svg" alt="">
   </div>
-  <div class="px p2"><div class="fly"><div class="bob"><img class="simurgh" src="assets/simurgh.svg" alt=""></div></div></div>
-  <div class="px p3"><img class="far" src="assets/mountains-far.svg" alt=""></div>
+  <div class="px p2"><div class="fly"><div class="bob"><img class="simurgh" data-src="assets/simurgh.svg" alt=""></div></div></div>
+  <div class="px p3"><img class="far" data-src="assets/mountains-far.svg" alt=""></div>
   <div class="px p4">
-    <div class="ride r1"><img class="gallop" src="assets/rider.svg" alt=""></div>
-    <div class="ride r2"><img class="gallop" src="assets/rider.svg" alt=""></div>
+    <div class="ride r1"><img class="gallop" data-src="assets/rider.svg" alt=""></div>
+    <div class="ride r2"><img class="gallop" data-src="assets/rider.svg" alt=""></div>
   </div>
-  <div class="px p5"><img class="near nl" src="assets/rocks-left.svg" alt=""><img class="near nr" src="assets/rocks-right.svg" alt=""></div>
+  <div class="px p5"><img class="near nl" data-src="assets/rocks-left.svg" alt=""><img class="near nr" data-src="assets/rocks-right.svg" alt=""></div>
   <canvas id="bgCanvas"></canvas>
+</div>
+<div class="scene scene-en"></div>
   <div class="vignette"></div>
 </div>
+<script>
+// only the active scene is loaded now; the other one is loaded lazily by bg.js on first switch
+(function(){var en=document.documentElement.lang==="en",sc=document.querySelector(en?".scene-en":".scene-fa");sc.classList.add("on");
+if(!en)sc.querySelectorAll("[data-src]").forEach(function(i){i.src=i.getAttribute("data-src");i.removeAttribute("data-src");});})();
+</script>
 
 <header>
   <a class="brand" href="./" aria-label="تایپ پارسی" data-i18n-aria="brand">
