@@ -35,7 +35,7 @@
   const cfg = { mode: "time", time: 30, len: "short" };
   try { Object.assign(cfg, JSON.parse(localStorage.getItem("ptype-cfg") || "{}")); } catch (e) {}
 
-  let target = "", segments = [], spans = [], typed = "";
+  let target = "", segments = [], typed = "";
   let total = 0, correctKeys = 0, startTime = 0, tick = null, running = false, finished = false;
   let lastPick = -1;
 
@@ -72,50 +72,110 @@
     const start = target.length ? target.length + 1 : 0;
     target = target ? target + " " + p.text : p.text;
     segments.push({ p, start, end: target.length });
-    if (render) renderFrom(start ? start - 1 : 0);
+    if (render) {
+      // کلمهٔ آخر (که فاصلهٔ پایانی نداشت) دوباره ساخته می‌شود
+      const last = words.pop(); last.el.remove();
+      buildWords(last.start);
+    }
   }
 
-  // ساخت span برای هر نویسه؛ کلمه‌ها nowrap تا وسط کلمه شکسته نشود
-  function render() { wordsEl.innerHTML = ""; spans = []; renderFrom(0); }
-  function renderFrom(from) {
-    let wordEl;
-    let i = spans.length;
+  // ---------- نمایش ----------
+  // برای اتصال درست حروف فارسی (به‌ویژه در Safari) هر کلمه از چند «تکه» ساخته می‌شود:
+  // نویسه‌های پشت‌سرهمی که وضعیت یکسان دارند (درست / غلط / تایپ‌نشده) در یک span می‌آیند،
+  // و در مرز دو تکه، اگر دو حرف باید به هم بچسبند، از دو طرف ZWJ گذاشته می‌شود تا شکل پیوستهٔ حروف حفظ شود.
+  // نشانگر (caret) یک عنصر جداست که با Range.getClientRects جای‌گذاری می‌شود.
+  const ZWJ = "\u200D";
+  const RIGHT_ONLY = new Set("اآأإٱدذرزژوؤۀة");
+  const isArabicLetter = c => /[\u0620-\u064A\u066E-\u06D3\u06D5\u06EE\u06EF\u06FA-\u06FC\u06FF]/.test(c);
+  const joinsLeft = c => isArabicLetter(c) && c !== "ء" && !RIGHT_ONLY.has(c);   // به حرف بعدی می‌چسبد
+  const joinsRight = c => isArabicLetter(c) && c !== "ء";                         // به حرف قبلی می‌چسبد
+  const needZWJ = k => joinsLeft(target[k - 1]) && joinsRight(target[k]);
+
+  let words = [], charWord = [], posNode = [], posOff = [];
+  const caret = document.createElement("div"); caret.id = "caret";
+
+  function render() {
+    wordsEl.textContent = ""; words = []; charWord = []; posNode = []; posOff = [];
+    wordsEl.appendChild(caret);
+    buildWords(0);
+  }
+  function buildWords(from) {
+    let i = from;
     while (i < target.length) {
-      wordEl = document.createElement("span"); wordEl.className = "word";
-      while (i < target.length) {
-        const c = target[i];
-        const s = document.createElement("span");
-        s.className = "ch" + (c === " " ? " sp" : "") + (c === ZWNJ ? " zw" : "");
-        s.textContent = c === " " ? "\u00A0" : c;
-        wordEl.appendChild(s); spans.push(s); i++;
-        if (c === " ") break;
-      }
-      wordsEl.appendChild(wordEl);
+      const s = i;
+      while (i < target.length && target[i] !== " ") i++;
+      if (i < target.length) i++; // فاصلهٔ پایان کلمه
+      const el = document.createElement("span"); el.className = "word";
+      const wi = words.length; words.push({ start: s, end: i, el });
+      for (let k = s; k < i; k++) charWord[k] = wi;
+      wordsEl.appendChild(el); renderWord(wi);
+    }
+  }
+  function stateOf(i) {
+    if (i >= typed.length) return "";
+    if (matches(target[i], typed[i])) return "ok";
+    return target[i] === " " || target[i] === ZWNJ ? "badspace" : "bad";
+  }
+  function renderWord(wi) {
+    const w = words[wi], el = w.el;
+    el.textContent = "";
+    const hasSp = target[w.end - 1] === " ";
+    const lettersEnd = hasSp ? w.end - 1 : w.end;
+    let k = w.start;
+    while (k < lettersEnd) {
+      const st = stateOf(k); let j = k;
+      while (j < lettersEnd && stateOf(j) === st) j++;
+      let text = "";
+      if (k > w.start && needZWJ(k)) text += ZWJ;
+      const offs = [];
+      for (let m = k; m < j; m++) { offs.push(text.length); text += target[m]; }
+      if (j < lettersEnd && needZWJ(j)) text += ZWJ;
+      const span = document.createElement("span");
+      span.className = st || "u";
+      const tn = document.createTextNode(text); span.appendChild(tn); el.appendChild(span);
+      for (let m = k; m < j; m++) { posNode[m] = tn; posOff[m] = offs[m - k]; }
+      k = j;
+    }
+    if (hasSp) {
+      const st = stateOf(w.end - 1);
+      const span = document.createElement("span"); span.className = "sp" + (st ? " " + st : "");
+      const tn = document.createTextNode("\u00A0"); span.appendChild(tn); el.appendChild(span);
+      posNode[w.end - 1] = tn; posOff[w.end - 1] = 0;
     }
   }
 
   function updateRange(a, b) {
-    for (let i = a; i < b && i < spans.length; i++) {
-      const s = spans[i]; s.classList.remove("ok", "bad", "badspace", "cur", "curEnd");
-      if (i < typed.length) {
-        if (matches(target[i], typed[i])) s.classList.add("ok");
-        else s.classList.add(target[i] === " " || target[i] === ZWNJ ? "badspace" : "bad");
-      }
-    }
+    const n = target.length; if (!n) return;
+    const w0 = charWord[Math.min(a, n - 1)], w1 = charWord[Math.min(Math.max(b - 1, a), n - 1)];
+    for (let wi = w0; wi <= w1; wi++) renderWord(wi);
     placeCaret();
   }
-  let caretEl = null;
-  function placeCaret() {
-    if (caretEl) caretEl.classList.remove("cur", "curEnd");
-    if (typed.length < spans.length) { caretEl = spans[typed.length]; caretEl.classList.add("cur"); }
-    else { caretEl = spans[spans.length - 1]; caretEl && caretEl.classList.add("curEnd"); }
-    scrollLines();
+
+  const range = document.createRange();
+  function charRect(i) {
+    const node = posNode[i];
+    range.setStart(node, posOff[i]); range.setEnd(node, posOff[i] + 1);
+    const rects = range.getClientRects();
+    for (const r of rects) if (r.width > 0) return r;
+    return rects[0] || node.parentElement.getBoundingClientRect();
   }
-  function scrollLines() {
-    if (!caretEl) return;
+  function placeCaret() {
+    const n = target.length; if (!n) return;
+    const idx = Math.min(typed.length, n);
+    const atEnd = idx >= n;
+    const ci = atEnd ? n - 1 : idx;
+    const r = charRect(ci);
+    const base = wordsEl.getBoundingClientRect();
+    const x = (atEnd ? r.left : r.right) - base.left;   // راست‌به‌چپ: ابتدای نویسه سمت راست آن است
+    const wordEl = words[charWord[ci]].el;
+    const lh = wordEl.offsetHeight || parseFloat(getComputedStyle(wrap).lineHeight);
+    caret.style.transform = `translate(${Math.round(x - 1)}px, ${Math.round(wordEl.offsetTop + lh * 0.2)}px)`;
+    caret.style.height = Math.round(lh * 0.6) + "px";
+    scrollLines(wordEl);
+  }
+  function scrollLines(wordEl) {
     const lh = parseFloat(getComputedStyle(wrap).lineHeight);
-    const top = caretEl.parentElement.offsetTop;
-    const line = Math.round(top / lh);
+    const line = Math.round(wordEl.offsetTop / lh);
     wordsEl.style.transform = line >= 2 ? `translateY(${-(line - 1) * lh}px)` : "";
   }
 
@@ -127,7 +187,7 @@
     clearInterval(tick); tick = null; running = false; finished = false;
     typed = ""; total = 0; correctKeys = 0; startTime = 0; input.value = "";
     setTarget(cfg.mode === "time" ? buildTimeMode() : buildPassageMode());
-    render(); wordsEl.style.transform = ""; caretEl = null; placeCaret();
+    render(); wordsEl.style.transform = ""; placeCaret();
     timerEl.textContent = cfg.mode === "time" ? fa(cfg.time) : ""; liveWpmEl.textContent = "";
     $("result").classList.add("hidden"); $("test").classList.remove("hidden");
     wrap.classList.remove("typing");
@@ -161,9 +221,10 @@
     let a = 0; while (a < old.length && a < v.length && old[a] === v[a]) a++;
     updateRange(a, Math.max(old.length, v.length) + 1);
     wrap.classList.add("typing"); clearTimeout(onInput.t); onInput.t = setTimeout(() => wrap.classList.remove("typing"), 600);
+    caretToEnd();
     if (cfg.mode === "time" && typed.length > target.length - 150) {
       const next = POOL[Math.floor(Math.random() * POOL.length)];
-      appendSegment(next, true); updateRange(typed.length - 1, spans.length);
+      appendSegment(next, true); placeCaret();
     }
     if (cfg.mode === "passage" && typed.length === target.length) finish();
   }
@@ -193,7 +254,12 @@
   function focusInput() { input.focus({ preventScroll: true }); wrap.classList.remove("blurred"); }
   input.addEventListener("blur", () => wrap.classList.add("blurred"));
   input.addEventListener("focus", () => wrap.classList.remove("blurred"));
-  wrap.addEventListener("mousedown", e => { e.preventDefault(); focusInput(); });
+  // textarea شفاف روی متن قرار دارد تا لمس متن در موبایل (iOS) مستقیماً صفحه‌کلید را باز کند.
+  // نشانگر متنِ textarea همیشه در انتها نگه داشته می‌شود.
+  const caretToEnd = () => { const l = input.value.length; if (input.selectionStart !== l || input.selectionEnd !== l) input.setSelectionRange(l, l); };
+  ["mouseup", "touchend", "focus", "select", "keyup"].forEach(ev => input.addEventListener(ev, () => setTimeout(caretToEnd, 0)));
+  window.addEventListener("resize", () => placeCaret());
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => placeCaret());
   input.addEventListener("input", onInput);
   input.addEventListener("keydown", e => {
     if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) e.preventDefault();
@@ -222,6 +288,6 @@
   $("restartBtn").addEventListener("click", reset);
   $("againBtn").addEventListener("click", reset);
 
-  window.__ptype = { get target() { return target; }, normalizeText, matches, finish, reset, cfg };
+  window.__ptype = { get target() { return target; }, get words() { return words; }, normalizeText, matches, finish, reset, cfg };
   syncButtons(); reset();
 })();

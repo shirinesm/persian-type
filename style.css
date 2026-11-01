@@ -20,20 +20,19 @@ main{flex:1;display:flex;align-items:center;justify-content:center}
 #liveStats{color:var(--main);font-size:26px;height:40px;display:flex;gap:24px}
 #liveWpm{color:var(--sub);font-size:20px;align-self:center}
 #wordsWrap{position:relative;height:calc(3 * 2.1em);overflow:hidden;font-size:28px;line-height:2.1em;outline:none;cursor:text}
-#words{display:flex;flex-wrap:wrap;transition:transform .12s ease;user-select:none}
+#words{position:relative;display:flex;flex-wrap:wrap;transition:transform .12s ease;-webkit-user-select:none;user-select:none}
 .word{white-space:nowrap;margin-left:.32em}
-.ch{color:var(--sub);position:relative}
-.ch.ok{color:var(--text)}
-.ch.bad{color:var(--err)}
-.ch.badspace{background:var(--errx);border-radius:3px}
-.ch.cur::after,.ch.curEnd::before{content:"";position:absolute;top:.35em;bottom:.35em;width:2px;background:var(--main);border-radius:2px;animation:blink 1s step-end infinite}
-.ch.cur::after{right:-1px}
-.ch.curEnd::before{left:-1px}
-#wordsWrap.typing .ch.cur::after,#wordsWrap.typing .ch.curEnd::before{animation:none}
+.word{color:var(--sub)}
+.word .ok{color:var(--text)}
+.word .bad{color:var(--err)}
+.word .sp.badspace{background:var(--errx);border-radius:3px}
+#caret{position:absolute;top:0;left:0;width:2px;background:var(--main);border-radius:2px;pointer-events:none;animation:blink 1s step-end infinite;transition:transform .08s ease}
+#wordsWrap.typing #caret{animation:none}
+#wordsWrap.blurred #caret{opacity:0;animation:none}
 @keyframes blink{50%{opacity:0}}
 #focusHint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--text);background:rgba(50,52,55,.82);z-index:2;opacity:0;pointer-events:none;transition:opacity .2s}
 #wordsWrap.blurred #focusHint{opacity:1}
-#hiddenInput{position:absolute;opacity:0;width:1px;height:1px;right:0;top:0;padding:0;border:0;resize:none;overflow:hidden;caret-color:transparent;pointer-events:none}
+#hiddenInput{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:0;font-size:16px;color:transparent;background:transparent;caret-color:transparent;resize:none;overflow:hidden;z-index:3;cursor:text;outline:none;-webkit-tap-highlight-color:transparent}
 #test{position:relative}
 #restartBtn{display:block;margin:28px auto 0;font-size:24px}
 .bigstats{display:flex;gap:64px;justify-content:center}

@@ -32,11 +32,11 @@
 <main>
   <section id="test">
     <div id="liveStats"><span id="timer"></span><span id="liveWpm"></span></div>
-    <div id="wordsWrap" tabindex="0">
-      <div id="focusHint">برای شروع کلیک کنید یا تایپ کنید</div>
+    <div id="wordsWrap">
+      <div id="focusHint">برای شروع، روی متن بزنید یا تایپ کنید</div>
+      <textarea id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" dir="rtl" inputmode="text" enterkeyhint="go" aria-label="ورودی تایپ"></textarea>
       <div id="words"></div>
     </div>
-    <textarea id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" dir="rtl"></textarea>
     <button id="restartBtn" title="شروع دوباره (Tab)">↻</button>
   </section>
 
