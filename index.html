@@ -5,11 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>تایپ پارسی | تمرین تایپ با ادبیات فارسی</title>
 <link rel="stylesheet" href="style.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E⌨️%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#1f3a7a">
+<link rel="icon" href="assets/rosette.svg" type="image/svg+xml">
 </head>
 <body>
 <header>
-  <div class="logo">تایپ<span>پارسی</span></div>
+  <div class="brand">
+    <img class="emblem" src="assets/faravahar.svg" alt="" aria-hidden="true">
+    <div class="cartouche"><h1 class="logo">تایپ <span>پارسی</span></h1></div>
+    <div class="tagline">تمرین تایپ با گنجینهٔ ادب پارسی</div>
+  </div>
   <nav id="config">
     <div class="group" id="modeGroup">
       <button data-mode="time" class="active">زمان</button>
@@ -31,16 +36,29 @@
 
 <main>
   <section id="test">
+    <img class="column col-r" src="assets/column.svg" alt="" aria-hidden="true">
+    <img class="column col-l" src="assets/column.svg" alt="" aria-hidden="true">
+    <div class="crown" aria-hidden="true"></div>
+    <div class="frame">
+    <div class="frieze-lions" aria-hidden="true"></div>
+    <div class="panel">
     <div id="liveStats"><span id="timer"></span><span id="liveWpm"></span></div>
     <div id="wordsWrap">
       <div id="focusHint">برای شروع، روی متن بزنید یا تایپ کنید</div>
       <textarea id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" dir="rtl" inputmode="text" enterkeyhint="go" aria-label="ورودی تایپ"></textarea>
       <div id="words"></div>
     </div>
+    </div>
+    <div class="frieze-rosettes" aria-hidden="true"></div>
+    </div>
     <button id="restartBtn" title="شروع دوباره (Tab)">↻</button>
   </section>
 
   <section id="result" class="hidden">
+    <div class="crown" aria-hidden="true"></div>
+    <div class="tablet">
+    <img class="medallion" src="assets/senmurv.svg" alt="" aria-hidden="true">
+    <h2 class="rtitle">کارنامه</h2>
     <div class="bigstats">
       <div><div class="label">سرعت (کلمه در دقیقه)</div><div class="val" id="rWpm"></div></div>
       <div><div class="label">دقت</div><div class="val" id="rAcc"></div></div>
@@ -50,12 +68,15 @@
       <div><span class="label">زمان</span><span id="rTime"></span></div>
       <div><span class="label">حالت</span><span id="rMode"></span></div>
     </div>
+    <div class="pearls" aria-hidden="true"></div>
     <div id="attrib"></div>
     <button id="againBtn">↻ دوباره</button>
+    </div>
   </section>
 </main>
 
 <footer>
+  <div class="pearls" aria-hidden="true"></div>
   <div class="keys"><kbd>Tab</kbd> یا <kbd>Enter</kbd> برای شروع دوباره · <kbd>Esc</kbd> برای توقف</div>
   <div class="note">متن‌ها از گنجینهٔ ادب فارسی؛ حافظ، سعدی، فردوسی، مولوی، خیام و دیگران</div>
 </footer>

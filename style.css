@@ -1,51 +1,125 @@
+/* تایپ پارسی — طراحی برگرفته از هنر ایران پیش از اسلام:
+   ستون‌های تخت جمشید، گل‌های دوازده‌پر، کاشی‌های لعابی شیر در شوش، دانه‌های مروارید و سیمرغ ساسانی، فروهر.
+   همهٔ نقش‌ها SVG دست‌ساز در پوشهٔ assets هستند. */
 @font-face{font-family:Vazirmatn;src:url(fonts/Vazirmatn-Regular.ttf) format("truetype");font-weight:400;font-display:swap}
 @font-face{font-family:Vazirmatn;src:url(fonts/Vazirmatn-Bold.ttf) format("truetype");font-weight:700;font-display:swap}
-:root{--bg:#323437;--sub:#646669;--subalt:#2c2e31;--text:#d1d0c5;--main:#e2b714;--err:#ca4754;--errx:#7e2a33}
+@font-face{font-family:Vazirmatn;src:url(fonts/Vazirmatn-Black.ttf) format("truetype");font-weight:900;font-display:swap}
+:root{
+  --sand:#e9dfc6; --stone:#f6efdc; --stone2:#efe4c8;
+  --lapis:#1f3a7a; --lapis-d:#14285a; --gold:#c9952e; --gold-d:#8a6216;
+  --turq:#2aa198; --ochre:#d08c2c; --verm:#b8321f; --ink:#1b2440; --muted:#857455;
+}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%}
-body{background:var(--bg);color:var(--sub);font-family:Vazirmatn,Tahoma,sans-serif;display:flex;flex-direction:column;min-height:100vh;padding:28px 6vw}
-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
-.logo{font-size:30px;font-weight:700;color:var(--text)}
-.logo span{color:var(--main);margin-right:4px}
-nav{display:flex;align-items:center;gap:12px;background:var(--subalt);padding:6px 14px;border-radius:8px}
-.group{display:flex;gap:4px}
+html,body{margin:0;min-height:100%}
+body{
+  color:var(--ink);font-family:Vazirmatn,Tahoma,sans-serif;display:flex;flex-direction:column;min-height:100vh;padding:20px 5vw 16px;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(255,250,235,.85),transparent 60%),
+    repeating-linear-gradient(0deg,rgba(138,116,80,.05) 0 2px,transparent 2px 7px),
+    var(--sand);
+}
+/* ---------- سربرگ ---------- */
+header{display:flex;flex-direction:column;align-items:center;gap:12px}
+.brand{display:flex;flex-direction:column;align-items:center}
+.emblem{width:170px;height:auto;margin-bottom:6px;filter:drop-shadow(0 1px 0 rgba(255,255,255,.5))}
+.cartouche{
+  position:relative;padding:4px 34px 8px;background:var(--lapis);border:2px solid var(--gold);
+  box-shadow:0 0 0 4px var(--lapis),0 0 0 5px var(--gold-d),0 6px 14px rgba(20,40,90,.25);
+  border-radius:4px;
+}
+.cartouche::before,.cartouche::after{content:"";position:absolute;top:50%;width:22px;height:22px;margin-top:-11px;background:url(assets/rosette.svg) center/contain no-repeat}
+.cartouche::before{right:6px}.cartouche::after{left:6px}
+.logo{margin:0;font-size:34px;font-weight:900;color:var(--stone);letter-spacing:0;line-height:1.5}
+.logo span{color:var(--gold)}
+.tagline{margin-top:10px;font-size:14px;color:var(--gold-d);font-weight:700}
+nav{display:flex;align-items:center;gap:10px;background:var(--lapis);padding:5px 14px;border-radius:999px;border:1.5px solid var(--gold);box-shadow:0 3px 8px rgba(20,40,90,.2)}
+.group{display:flex;gap:2px}
 .group.hidden{display:none}
-.sep{width:3px;height:18px;background:var(--bg);border-radius:2px}
-button{font-family:inherit;background:none;border:0;color:var(--sub);font-size:15px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:color .15s}
-button:hover{color:var(--text)}
-button.active{color:var(--main)}
-main{flex:1;display:flex;align-items:center;justify-content:center}
+.sep{width:6px;height:6px;background:var(--gold);transform:rotate(45deg)}
+button{font-family:inherit;background:none;border:0;color:#c9d3ea;font-size:15px;cursor:pointer;padding:4px 10px;border-radius:999px;transition:color .15s,background .15s}
+button:hover{color:#fff}
+button.active{color:var(--lapis-d);background:var(--gold);font-weight:700}
+/* ---------- صحنهٔ تایپ ---------- */
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:18px 0}
 #test,#result{width:100%;max-width:1000px}
+#test{position:relative}
 .hidden{display:none!important}
-#liveStats{color:var(--main);font-size:26px;height:40px;display:flex;gap:24px}
-#liveWpm{color:var(--sub);font-size:20px;align-self:center}
-#wordsWrap{position:relative;height:calc(3 * 2.1em);overflow:hidden;font-size:28px;line-height:2.1em;outline:none;cursor:text}
+.frame{position:relative;background:var(--lapis);padding:0 10px;border-radius:3px;box-shadow:0 10px 30px rgba(20,40,90,.28);
+  border-left:10px solid transparent;border-right:10px solid transparent;
+  border-image:url(assets/band-pearls.svg) 0 16 / 0 10px round}
+#test .crown{margin:0 14px}
+.crown{height:22px;background:url(assets/merlons.svg) center bottom/40px 22px repeat-x}
+.frieze-lions{height:70px;margin:0 -10px;background:url(assets/band-lions.svg) center/auto 70px repeat-x;border-top:4px solid var(--gold);border-bottom:4px solid var(--gold)}
+.frieze-rosettes{height:40px;margin:0 -10px;background:url(assets/band-rosette.svg) center/40px 40px repeat-x;border-top:4px solid var(--gold)}
+.panel{background:linear-gradient(180deg,var(--stone),var(--stone2));padding:14px 26px 18px;outline:2px solid var(--gold);outline-offset:-8px;box-shadow:inset 0 0 0 9px var(--stone),inset 0 0 0 10px rgba(138,98,22,.35)}
+#liveStats{font-size:24px;height:40px;display:flex;gap:22px;align-items:center;padding:0 8px}
+#timer{color:var(--lapis);font-weight:900}
+#liveWpm{color:var(--gold-d);font-size:18px;font-weight:700}
+#wordsWrap{position:relative;height:calc(3 * 2.1em);overflow:hidden;font-size:28px;line-height:2.1em;outline:none;cursor:text;padding:0 8px}
 #words{position:relative;display:flex;flex-wrap:wrap;transition:transform .12s ease;-webkit-user-select:none;user-select:none}
-.word{white-space:nowrap;margin-left:.32em}
-.word{color:var(--sub)}
-.word .ok{color:var(--text)}
-.word .bad{color:var(--err)}
-.word .sp.badspace{background:var(--errx);border-radius:3px}
-#caret{position:absolute;top:0;left:0;width:2px;background:var(--main);border-radius:2px;pointer-events:none;animation:blink 1s step-end infinite;transition:transform .08s ease}
+/* درون کلمه: فقط رنگ — بدون inline-block، transform یا letter-spacing تا حروف به هم بچسبند */
+.word{white-space:nowrap;margin-left:.32em;color:var(--muted)}
+.word .ok{color:var(--ink)}
+.word .bad{color:var(--verm)}
+.word .sp.badspace{background:rgba(184,50,31,.3);border-radius:3px}
+#caret{position:absolute;top:0;left:0;width:3px;background:var(--ochre);border-radius:2px;pointer-events:none;animation:blink 1s step-end infinite;transition:transform .08s ease}
 #wordsWrap.typing #caret{animation:none}
 #wordsWrap.blurred #caret{opacity:0;animation:none}
 @keyframes blink{50%{opacity:0}}
-#focusHint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--text);background:rgba(50,52,55,.82);z-index:2;opacity:0;pointer-events:none;transition:opacity .2s}
+#focusHint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--lapis);background:rgba(246,239,220,.86);z-index:2;opacity:0;pointer-events:none;transition:opacity .2s}
 #wordsWrap.blurred #focusHint{opacity:1}
 #hiddenInput{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:0;font-size:16px;color:transparent;background:transparent;caret-color:transparent;resize:none;overflow:hidden;z-index:3;cursor:text;outline:none;-webkit-tap-highlight-color:transparent}
-#test{position:relative}
-#restartBtn{display:block;margin:28px auto 0;font-size:24px}
-.bigstats{display:flex;gap:64px;justify-content:center}
-.label{font-size:15px;color:var(--sub)}
-.val{font-size:64px;color:var(--main);font-weight:700;line-height:1.2}
-.smallstats{display:flex;gap:40px;justify-content:center;margin-top:16px}
-.smallstats div{display:flex;flex-direction:column;align-items:center;color:var(--text);font-size:20px}
-#attrib{margin:36px auto 0;max-width:760px;background:var(--subalt);border-radius:10px;padding:18px 24px}
-#attrib .item{padding:10px 0;border-bottom:1px solid var(--bg)}
+#restartBtn{display:block;margin:22px auto 0;font-size:22px;width:46px;height:46px;padding:0;border-radius:50%;background:var(--lapis);color:var(--gold);border:2px solid var(--gold);box-shadow:0 3px 8px rgba(20,40,90,.25)}
+#restartBtn:hover{color:#fff}
+/* ستون‌های تخت جمشید در دو سوی صحنه (فقط صفحه‌های پهن) */
+.column{position:absolute;bottom:68px;height:330px;width:auto;opacity:.95;pointer-events:none;display:none}
+.col-r{right:-112px}.col-l{left:-112px}
+@media (min-width:1260px){.column{display:block}}
+/* ---------- کارنامه (نتیجه) ---------- */
+#result{max-width:820px}
+#result .crown{margin:0 18px}
+.tablet{position:relative;background:linear-gradient(180deg,var(--stone),var(--stone2));border:3px solid var(--lapis);outline:2px solid var(--gold);outline-offset:-9px;border-radius:3px;padding:26px 30px 26px;box-shadow:0 10px 30px rgba(20,40,90,.25);text-align:center}
+.medallion{width:118px;height:118px;display:block;margin:0 auto 4px;filter:drop-shadow(0 3px 6px rgba(20,40,90,.3))}
+.rtitle{margin:0 0 10px;font-weight:900;font-size:26px;color:var(--lapis)}
+.bigstats{display:flex;gap:60px;justify-content:center}
+.label{font-size:14px;color:var(--gold-d);font-weight:700}
+.val{font-size:60px;color:var(--lapis);font-weight:900;line-height:1.2}
+.smallstats{display:flex;gap:36px;justify-content:center;margin-top:12px}
+.smallstats div{display:flex;flex-direction:column;align-items:center;color:var(--ink);font-size:19px}
+.pearls{height:12px;margin:22px auto 0;max-width:520px;background:url(assets/band-pearls.svg) center/12px 12px repeat-x;border-radius:2px}
+#attrib{margin:18px auto 0;max-width:680px;text-align:right}
+#attrib .item{padding:12px 46px 12px 6px;border-bottom:1px solid rgba(138,98,22,.3);position:relative}
+#attrib .item::before{content:"";position:absolute;right:8px;top:16px;width:26px;height:26px;background:url(assets/rosette.svg) center/contain no-repeat}
 #attrib .item:last-child{border-bottom:0}
-#attrib .quote{color:var(--text);font-size:17px;line-height:2}
-#attrib .who{color:var(--main);margin-top:4px;font-size:14px}
-#againBtn{display:block;margin:24px auto 0;font-size:18px}
-footer{text-align:center;font-size:13px;display:flex;flex-direction:column;gap:6px}
-kbd{background:var(--sub);color:var(--bg);border-radius:4px;padding:0 6px;font-family:inherit;font-size:12px}
-@media (max-width:640px){#wordsWrap{font-size:22px}.val{font-size:44px}.bigstats{gap:28px}}
+#attrib .quote{color:var(--ink);font-size:18px;line-height:2}
+#attrib .who{color:var(--gold-d);margin-top:2px;font-size:14px;font-weight:700}
+#againBtn{display:inline-block;margin:18px auto 0;font-size:17px;padding:6px 22px;background:var(--lapis);color:var(--stone);border:2px solid var(--gold)}
+#againBtn:hover{color:var(--gold)}
+/* ---------- پاورقی ---------- */
+footer{text-align:center;font-size:13px;display:flex;flex-direction:column;gap:6px;color:var(--muted)}
+footer .pearls{margin:0 auto 6px;width:180px}
+kbd{background:var(--lapis);color:var(--stone);border-radius:4px;padding:0 6px;font-family:inherit;font-size:12px}
+/* ---------- موبایل ---------- */
+@media (max-width:640px){
+  body{padding:12px 10px 12px}
+  .emblem{width:112px;margin-bottom:4px}
+  .logo{font-size:26px}
+  .cartouche{padding:2px 30px 6px}
+  .cartouche::before,.cartouche::after{width:17px;height:17px;margin-top:-8.5px}
+  .tagline{margin-top:7px;font-size:12px}
+  header{gap:9px}
+  main{padding:14px 0;align-items:flex-start}
+  .frame{padding:0 6px;border-left-width:7px;border-right-width:7px}
+  .crown{height:16px;background-size:30px 16px}
+  .frieze-lions{height:46px;margin:0 -6px;background-size:auto 46px;border-width:3px}
+  .frieze-rosettes{height:28px;margin:0 -6px;background-size:28px 28px;border-top-width:3px}
+  .panel{padding:8px 12px 12px;outline-offset:-6px;box-shadow:inset 0 0 0 7px var(--stone),inset 0 0 0 8px rgba(138,98,22,.35)}
+  #liveStats{font-size:20px;height:32px}
+  #wordsWrap{font-size:22px;padding:0 4px}
+  .tablet{padding:18px 14px}
+  .medallion{width:92px;height:92px}
+  .val{font-size:44px}.bigstats{gap:28px}.smallstats{gap:18px}
+  #attrib .item{padding-right:38px}
+  #attrib .quote{font-size:16px}
+  footer .keys{display:none}
+}
