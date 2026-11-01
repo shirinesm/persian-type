@@ -21,12 +21,58 @@
   }
   // نیم‌فاصله را با نیم‌فاصله یا فاصله می‌پذیریم (بسیاری از صفحه‌کلیدها نیم‌فاصله ندارند)
   function matches(expected, typed) {
+    if (lang === "en") return enCanon(expected) === enCanon(typed);
     typed = normChar(typed);
     if (expected === ZWNJ) return typed === ZWNJ || typed === " ";
     return expected === typed;
   }
 
-  const POOL = PASSAGES.map((p, i) => ({ ...p, id: i, text: normalizeText(p.text) }));
+  // ---------- زبان (فارسی / English) ----------
+  const I18N = {
+    fa: {
+      title: "تایپ پارسی | تمرین تایپ با ادبیات فارسی",
+      desc: "تمرین تایپ فارسی با گزیده‌هایی از حافظ، سعدی، فردوسی، مولوی، خیام و دیگران",
+      brand: "تایپ پارسی", logo: "تایپ <b>پارسی</b>", settings: "تنظیمات",
+      time: "زمان", passage: "متن", short: "کوتاه", medium: "متوسط", long: "بلند",
+      hint: "برای شروع، روی متن بزنید یا تایپ کنید", input: "ورودی تایپ",
+      restart: "شروع دوباره", restartTitle: "شروع دوباره (Tab)",
+      speed: "سرعت", wpmUnit: "کلمه در دقیقه", accuracy: "دقت", percent: "درصد", chart: "نمودار سرعت",
+      legend: '<i class="lw"></i> سرعت <i class="lr"></i> خام <i class="le"></i> خطا',
+      chars: "درست / غلط", timeLabel: "زمان", modeLabel: "حالت", typedTitle: "آنچه تایپ کردید", again: "دوباره",
+      keys: '<kbd>Tab</kbd> یا <kbd>Enter</kbd> شروع دوباره <span class="dot"></span> <kbd>Esc</kbd> پایان',
+      note: "گزیده‌هایی از حافظ، سعدی، فردوسی، مولوی، خیام و دیگران",
+      liveWpm: "ک/د", sec: " ثانیه", pct: "٪", modeTime: "زمان ", lens: { short: "متن کوتاه", medium: "متن متوسط", long: "متن بلند" },
+      q: ["«", "»"], sepWho: "، "
+    },
+    en: {
+      title: "Parsi Type | Typing practice with English literature & philosophy",
+      desc: "Typing practice with passages from Shakespeare, Austen, Dickens, the Brontës, Melville, Thoreau, Emerson, Keats, Whitman, Dickinson, Locke, Hume, Mill and more.",
+      brand: "Parsi Type", logo: "Parsi <b>Type</b>", settings: "Settings",
+      time: "time", passage: "passage", short: "short", medium: "medium", long: "long",
+      hint: "Click or start typing to begin", input: "Typing input",
+      restart: "Restart", restartTitle: "Restart (Tab)",
+      speed: "speed", wpmUnit: "words per minute", accuracy: "accuracy", percent: "percent", chart: "Speed chart",
+      legend: '<i class="lw"></i> wpm <i class="lr"></i> raw <i class="le"></i> errors',
+      chars: "correct / wrong", timeLabel: "time", modeLabel: "mode", typedTitle: "What you typed", again: "Again",
+      keys: '<kbd>Tab</kbd> or <kbd>Enter</kbd> restart <span class="dot"></span> <kbd>Esc</kbd> finish',
+      note: "Passages from Shakespeare, Austen, Dickens, Melville, Thoreau, Hume, Mill and others",
+      liveWpm: "wpm", sec: "s", pct: "%", modeTime: "time ", lens: { short: "short passage", medium: "medium passage", long: "long passage" },
+      q: ["“", "”"], sepWho: ", "
+    }
+  };
+  let lang = document.documentElement.lang === "en" ? "en" : "fa";
+  const T = () => I18N[lang];
+  const num = n => lang === "fa" ? fa(n) : String(n);
+  // در انگلیسی، نشانه‌های تایپوگرافیک متن با معادل ساده‌ی صفحه‌کلید هم پذیرفته می‌شوند (و برعکس، برای نقل‌قول‌های هوشمند iOS)
+  const EN_EQ = { "\u2019": "'", "\u2018": "'", "\u02BC": "'", "\u201C": '"', "\u201D": '"', "\u2014": "-", "\u2013": "-", "\u00A0": " " };
+  const enCanon = c => EN_EQ[c] || c;
+  const POOLS = {
+    fa: PASSAGES.map((p, i) => ({ ...p, id: i, text: normalizeText(p.text) })),
+    en: PASSAGES_EN.map((p, i) => ({ ...p, id: i, text: p.text.replace(/\s+/g, " ").trim() }))
+  };
+  let POOL = POOLS[lang];
+  // مرز طول برای کوتاه/متوسط/بلند (فارسی بدون تغییر)
+  const LEN_CUT = { fa: [90, 170], en: [120, 175] };
 
   const $ = id => document.getElementById(id);
   const wordsEl = $("words"), wrap = $("wordsWrap"), input = $("hiddenInput");
@@ -48,9 +94,10 @@
   }
 
   function buildPassageMode() {
-    const short = POOL.filter(p => p.text.length <= 90);
-    const medium = POOL.filter(p => p.text.length > 90 && p.text.length <= 170);
-    const long = POOL.filter(p => p.text.length > 170);
+    const [c1, c2] = LEN_CUT[lang];
+    const short = POOL.filter(p => p.text.length <= c1);
+    const medium = POOL.filter(p => p.text.length > c1 && p.text.length <= c2);
+    const long = POOL.filter(p => p.text.length > c2);
     if (cfg.len === "short") return [pickRandom(short)];
     if (cfg.len === "medium") return [pickRandom(medium)];
     // متن بلند: یک قطعهٔ بلند، یا چند قطعه پشت سر هم تا حدود ۲۵۰ نویسه
@@ -91,7 +138,7 @@
   const isArabicLetter = c => /[\u0620-\u064A\u066E-\u06D3\u06D5\u06EE\u06EF\u06FA-\u06FC\u06FF]/.test(c);
   const joinsLeft = c => isArabicLetter(c) && c !== "ء" && !RIGHT_ONLY.has(c);   // به حرف بعدی می‌چسبد
   const joinsRight = c => isArabicLetter(c) && c !== "ء";                         // به حرف قبلی می‌چسبد
-  const needZWJ = k => joinsLeft(target[k - 1]) && joinsRight(target[k]);
+  const needZWJ = k => lang === "fa" && joinsLeft(target[k - 1]) && joinsRight(target[k]);
 
   let words = [], charWord = [], posNode = [], posOff = [];
   const caret = document.createElement("div"); caret.id = "caret";
@@ -168,7 +215,8 @@
     const ci = atEnd ? n - 1 : idx;
     const r = charRect(ci);
     const base = wordsEl.getBoundingClientRect();
-    const x = (atEnd ? r.left : r.right) - base.left;   // راست‌به‌چپ: ابتدای نویسه سمت راست آن است
+    const rtl = lang === "fa";   // راست‌به‌چپ: ابتدای نویسه سمت راست آن است
+    const x = (rtl ? (atEnd ? r.left : r.right) : (atEnd ? r.right : r.left)) - base.left;
     const wordEl = words[charWord[ci]].el;
     const lh = wordEl.offsetHeight || parseFloat(getComputedStyle(wrap).lineHeight);
     caret.style.transform = `translate(${Math.round(x - 1)}px, ${Math.round(wordEl.offsetTop + lh * 0.2)}px)`;
@@ -191,7 +239,7 @@
     samples = []; lastSampleSec = 0; errSince = 0;
     setTarget(cfg.mode === "time" ? buildTimeMode() : buildPassageMode());
     render(); wordsEl.style.transform = ""; placeCaret();
-    timerEl.textContent = cfg.mode === "time" ? fa(cfg.time) : ""; liveWpmEl.textContent = "";
+    timerEl.textContent = cfg.mode === "time" ? num(cfg.time) : ""; liveWpmEl.textContent = "";
     showView("test");
     wrap.classList.remove("typing");
     focusInput();
@@ -203,10 +251,10 @@
       const t = elapsed();
       if (cfg.mode === "time") {
         const left = Math.max(0, Math.ceil(cfg.time - t));
-        timerEl.textContent = fa(left);
+        timerEl.textContent = num(left);
         if (t >= cfg.time) finish();
-      } else timerEl.textContent = fa(Math.floor(t));
-      liveWpmEl.textContent = fa(wpm(t)) + " ک/د";
+      } else timerEl.textContent = num(Math.floor(t));
+      liveWpmEl.textContent = num(wpm(t)) + " " + T().liveWpm;
       sample(t);
     }, 200);
   }
@@ -249,16 +297,16 @@
     sample(sec);
     if (sec - lastSampleSec > .3 || !samples.length) samples.push({ s: sec, wpm: wpm(sec), raw: Math.round((typed.length / 5) / (Math.max(sec, .001) / 60)), err: errSince });
     countUp($("rWpm"), wpm(sec), "");
-    countUp($("rAcc"), acc, "٪");
-    $("rChars").textContent = fa(correctChars()) + " / " + fa(typed.length - correctChars());
-    $("rTime").textContent = fa(Math.round(sec)) + " ثانیه";
-    $("rMode").textContent = cfg.mode === "time" ? "زمان " + fa(cfg.time) : { short: "متن کوتاه", medium: "متن متوسط", long: "متن بلند" }[cfg.len];
+    countUp($("rAcc"), acc, T().pct);
+    $("rChars").textContent = num(correctChars()) + " / " + num(typed.length - correctChars());
+    $("rTime").textContent = num(Math.round(sec)) + T().sec;
+    $("rMode").textContent = cfg.mode === "time" ? T().modeTime + num(cfg.time) : T().lens[cfg.len];
     const reached = segments.filter(s => s.start < Math.max(1, typed.length));
     $("attrib").innerHTML = "";
     reached.forEach(s => {
       const d = document.createElement("div"); d.className = "item";
-      const q = document.createElement("div"); q.className = "quote"; q.textContent = "«" + s.p.text + "»";
-      const w = document.createElement("div"); w.className = "who"; w.textContent = "— " + s.p.author + "، " + s.p.source;
+      const q = document.createElement("div"); q.className = "quote"; q.textContent = T().q[0] + s.p.text + T().q[1];
+      const w = document.createElement("div"); w.className = "who"; w.textContent = "— " + s.p.author + T().sepWho + s.p.source;
       d.append(q, w); $("attrib").appendChild(d);
     });
     showView("result");
@@ -277,12 +325,14 @@
   }
   // شمارش متحرک آمار
   function countUp(el, to, prefix) {
-    const done = () => { el.textContent = prefix + fa(to); };
+    // فارسی: «٪۹۶» مانند قبل؛ انگلیسی: «96%»
+    const show = v => lang === "fa" ? prefix + fa(v) : v + prefix;
+    const done = () => { el.textContent = show(to); };
     if (reduceMotion() || to <= 0) return done();
     const t0 = performance.now(), D = 900;
     (function step(now) {
       const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3);
-      el.textContent = prefix + fa(Math.round(to * e));
+      el.textContent = show(Math.round(to * e));
       if (k < 1) requestAnimationFrame(step); else done();
     })(t0);
     setTimeout(done, D + 100); // اگر زبانه پنهان باشد
@@ -300,9 +350,9 @@
     const line = k => pts.map((p, i) => (i ? "L" : "M") + X(p.s).toFixed(1) + " " + Y(p[k]).toFixed(1)).join(" ");
     const area = line("wpm") + ` L${X(maxS).toFixed(1)} ${Hc - pb} L${X(pts[0].s).toFixed(1)} ${Hc - pb} Z`;
     let grid = "";
-    for (let i = 0; i <= 3; i++) { const v = maxV / 1.15 * i / 3, y = Y(v); grid += `<line x1="${pl}" x2="${Wc - pr}" y1="${y}" y2="${y}" class="g"/><text x="${pl - 6}" y="${y + 4}" class="ax" text-anchor="end">${fa(Math.round(v))}</text>`; }
+    for (let i = 0; i <= 3; i++) { const v = maxV / 1.15 * i / 3, y = Y(v); grid += `<line x1="${pl}" x2="${Wc - pr}" y1="${y}" y2="${y}" class="g"/><text x="${pl - 6}" y="${y + 4}" class="ax" text-anchor="end">${num(Math.round(v))}</text>`; }
     const step = Math.max(1, Math.ceil(pts.length / 8));
-    pts.forEach((p, i) => { if (i % step === 0 || i === pts.length - 1) grid += `<text x="${X(p.s)}" y="${Hc - 6}" class="ax" text-anchor="middle">${fa(Math.round(p.s))}</text>`; });
+    pts.forEach((p, i) => { if (i % step === 0 || i === pts.length - 1) grid += `<text x="${X(p.s)}" y="${Hc - 6}" class="ax" text-anchor="middle">${num(Math.round(p.s))}</text>`; });
     const errs = pts.filter(p => p.err).map(p => `<circle cx="${X(p.s)}" cy="${Y(p.wpm)}" r="${Math.min(7, 3 + p.err)}" class="e"/>`).join("");
     svg.innerHTML = `<defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9c46a" stop-opacity=".35"/><stop offset="1" stop-color="#e9c46a" stop-opacity="0"/></linearGradient></defs>
       ${grid}<path d="${area}" fill="url(#ga)" class="ar"/><path d="${line("raw")}" class="r"/><path d="${line("wpm")}" class="w" pathLength="1"/>${errs}`;
@@ -344,6 +394,38 @@
   $("restartBtn").addEventListener("click", reset);
   $("againBtn").addEventListener("click", reset);
 
-  window.__ptype = { get target() { return target; }, get words() { return words; }, normalizeText, matches, finish, reset, cfg };
+  // اعمال زبان روی کل رابط
+  function applyLang(save) {
+    const t = T(), h = document.documentElement;
+    h.lang = lang; h.dir = lang === "en" ? "ltr" : "rtl";
+    document.title = t.title; $("metaDesc").setAttribute("content", t.desc);
+    document.querySelectorAll("[data-i18n]").forEach(el => { el.innerHTML = t[el.dataset.i18n]; });
+    document.querySelectorAll("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t[el.dataset.i18nAria]));
+    document.querySelectorAll("[data-i18n-title]").forEach(el => el.setAttribute("title", t[el.dataset.i18nTitle]));
+    document.querySelectorAll("[data-num]").forEach(el => { el.textContent = num(+el.dataset.num); });
+    input.setAttribute("dir", lang === "en" ? "ltr" : "rtl");
+    input.setAttribute("lang", lang);
+    document.querySelectorAll("#langToggle [data-lang]").forEach(b => { const on = b.dataset.lang === lang; b.classList.toggle("active", on); b.setAttribute("aria-pressed", on); });
+    $("langToggle").dataset.active = lang;
+    POOL = POOLS[lang]; lastPick = -1;
+    if (save) {
+      try { localStorage.setItem("ptype-lang", lang); } catch (e) {}
+      try { const u = new URL(location.href); u.searchParams.set("lang", lang); history.replaceState(null, "", u); } catch (e) {}
+    }
+  }
+  function setLang(l) {
+    if (l === lang) return;
+    lang = l; applyLang(true); reset();
+  }
+  $("langToggle").addEventListener("click", e => {
+    const b = e.target.closest("[data-lang]"); if (!b) return;
+    setLang(b.dataset.lang); b.blur();
+  });
+  (function initLang() {
+    let fromUrl = null; try { fromUrl = new URLSearchParams(location.search).get("lang"); } catch (e) {}
+    applyLang(fromUrl === "en" || fromUrl === "fa");
+  })();
+
+  window.__ptype = { get target() { return target; }, get words() { return words; }, get lang() { return lang; }, setLang, normalizeText, matches, finish, reset, cfg };
   syncButtons(); reset();
 })();

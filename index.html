@@ -4,10 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>تایپ پارسی | تمرین تایپ با ادبیات فارسی</title>
-<meta name="description" content="تمرین تایپ فارسی با گزیده‌هایی از حافظ، سعدی، فردوسی، مولوی، خیام و دیگران">
+<meta name="description" id="metaDesc" content="تمرین تایپ فارسی با گزیده‌هایی از حافظ، سعدی، فردوسی، مولوی، خیام و دیگران">
 <meta name="theme-color" content="#05070f">
 <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/Vazirmatn-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<script>
+// زبان پیش از نمایش صفحه تعیین می‌شود: ?lang=en|fa ، سپس انتخاب ذخیره‌شده، وگرنه فارسی
+(function(){var l;try{l=new URLSearchParams(location.search).get("lang");}catch(e){}
+if(l!=="en"&&l!=="fa"){try{l=localStorage.getItem("ptype-lang");}catch(e){}}
+if(l!=="en")l="fa";var h=document.documentElement;h.lang=l;h.dir=l==="en"?"ltr":"rtl";
+if(l==="en")document.title="Parsi Type | Typing practice with English literature & philosophy";})();
+</script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -30,27 +37,32 @@
 </div>
 
 <header>
-  <a class="brand" href="./" aria-label="تایپ پارسی">
+  <a class="brand" href="./" aria-label="تایپ پارسی" data-i18n-aria="brand">
     <img class="mark" src="assets/mark.svg" alt="" width="40" height="40">
-    <span class="logo">تایپ <b>پارسی</b></span>
+    <span class="logo" data-i18n="logo">تایپ <b>پارسی</b></span>
   </a>
-  <nav id="config" aria-label="تنظیمات">
+  <nav id="config" aria-label="تنظیمات" data-i18n-aria="settings">
     <div class="group" id="modeGroup">
-      <button data-mode="time" class="active">زمان</button>
-      <button data-mode="passage">متن</button>
+      <button data-mode="time" class="active" data-i18n="time">زمان</button>
+      <button data-mode="passage" data-i18n="passage">متن</button>
     </div>
     <span class="sep"></span>
     <div class="group" id="timeGroup">
-      <button data-time="15">۱۵</button>
-      <button data-time="30" class="active">۳۰</button>
-      <button data-time="60">۶۰</button>
+      <button data-time="15" data-num="15">۱۵</button>
+      <button data-time="30" class="active" data-num="30">۳۰</button>
+      <button data-time="60" data-num="60">۶۰</button>
     </div>
     <div class="group hidden" id="lenGroup">
-      <button data-len="short" class="active">کوتاه</button>
-      <button data-len="medium">متوسط</button>
-      <button data-len="long">بلند</button>
+      <button data-len="short" class="active" data-i18n="short">کوتاه</button>
+      <button data-len="medium" data-i18n="medium">متوسط</button>
+      <button data-len="long" data-i18n="long">بلند</button>
     </div>
   </nav>
+  <div id="langToggle" role="group" aria-label="زبان / Language">
+    <button data-lang="fa" lang="fa" aria-pressed="true"><span class="full">فارسی</span><span class="short">فا</span></button>
+    <button data-lang="en" lang="en" aria-pressed="false"><span class="full">English</span><span class="short">EN</span></button>
+    <i class="knob" aria-hidden="true"></i>
+  </div>
 </header>
 
 <main>
@@ -61,12 +73,12 @@
         <span class="stat sub"><span id="liveWpm"></span></span>
       </div>
       <div id="wordsWrap">
-        <div id="focusHint"><span>برای شروع، روی متن بزنید یا تایپ کنید</span></div>
-        <textarea id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" dir="rtl" inputmode="text" enterkeyhint="go" aria-label="ورودی تایپ"></textarea>
+        <div id="focusHint"><span data-i18n="hint">برای شروع، روی متن بزنید یا تایپ کنید</span></div>
+        <textarea id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" dir="rtl" inputmode="text" enterkeyhint="go" aria-label="ورودی تایپ" data-i18n-aria="input"></textarea>
         <div id="words"></div>
       </div>
     </div>
-    <button id="restartBtn" class="icon-btn" title="شروع دوباره (Tab)" aria-label="شروع دوباره">
+    <button id="restartBtn" class="icon-btn" title="شروع دوباره (Tab)" aria-label="شروع دوباره" data-i18n-title="restartTitle" data-i18n-aria="restart">
       <svg viewBox="0 0 24 24" width="22" height="22"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
   </section>
@@ -74,30 +86,31 @@
   <section id="result" class="view hidden">
     <div class="card result-card">
       <div class="rtop">
-        <div class="big"><div class="label">سرعت</div><div class="val" id="rWpm">۰</div><div class="unit">کلمه در دقیقه</div></div>
-        <div class="big"><div class="label">دقت</div><div class="val" id="rAcc">۰</div><div class="unit">درصد</div></div>
-        <div class="chartWrap"><svg id="chart" viewBox="0 0 600 170" preserveAspectRatio="none" aria-label="نمودار سرعت"></svg><div class="legend"><i class="lw"></i> سرعت <i class="lr"></i> خام <i class="le"></i> خطا</div></div>
+        <div class="big"><div class="label" data-i18n="speed">سرعت</div><div class="val" id="rWpm">۰</div><div class="unit" data-i18n="wpmUnit">کلمه در دقیقه</div></div>
+        <div class="big"><div class="label" data-i18n="accuracy">دقت</div><div class="val" id="rAcc">۰</div><div class="unit" data-i18n="percent">درصد</div></div>
+        <div class="chartWrap"><svg id="chart" viewBox="0 0 600 170" preserveAspectRatio="none" aria-label="نمودار سرعت" data-i18n-aria="chart"></svg><div class="legend" data-i18n="legend"><i class="lw"></i> سرعت <i class="lr"></i> خام <i class="le"></i> خطا</div></div>
       </div>
       <div class="chips">
-        <div class="chip"><span class="label">درست / غلط</span><span id="rChars"></span></div>
-        <div class="chip"><span class="label">زمان</span><span id="rTime"></span></div>
-        <div class="chip"><span class="label">حالت</span><span id="rMode"></span></div>
+        <div class="chip"><span class="label" data-i18n="chars">درست / غلط</span><span id="rChars"></span></div>
+        <div class="chip"><span class="label" data-i18n="timeLabel">زمان</span><span id="rTime"></span></div>
+        <div class="chip"><span class="label" data-i18n="modeLabel">حالت</span><span id="rMode"></span></div>
       </div>
-      <div class="attrib-title">آنچه تایپ کردید</div>
+      <div class="attrib-title" data-i18n="typedTitle">آنچه تایپ کردید</div>
       <div id="attrib"></div>
       <button id="againBtn" class="primary">
         <svg viewBox="0 0 24 24" width="18" height="18"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        دوباره
+        <span data-i18n="again">دوباره</span>
       </button>
     </div>
   </section>
 </main>
 
 <footer>
-  <div class="keys"><kbd>Tab</kbd> یا <kbd>Enter</kbd> شروع دوباره <span class="dot"></span> <kbd>Esc</kbd> پایان</div>
-  <div class="note">گزیده‌هایی از حافظ، سعدی، فردوسی، مولوی، خیام و دیگران</div>
+  <div class="keys" data-i18n="keys"><kbd>Tab</kbd> یا <kbd>Enter</kbd> شروع دوباره <span class="dot"></span> <kbd>Esc</kbd> پایان</div>
+  <div class="note" data-i18n="note">گزیده‌هایی از حافظ، سعدی، فردوسی، مولوی، خیام و دیگران</div>
 </footer>
 <script src="texts.js"></script>
+<script src="texts-en.js"></script>
 <script src="app.js"></script>
 <script src="bg.js" defer></script>
 </body>
