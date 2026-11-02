@@ -16,18 +16,18 @@
       found: (i, n, q) => `داستان ${num(i)} از ${num(n)} برای «${esc(q)}»`,
       none: q => `برای «${esc(q)}» داستانی پیدا نشد. یکی از این موضوع‌ها را امتحان کنید یا یک داستان تصادفی بخوانید:`,
       random: "یک داستان تصادفی", words: n => `${num(n)} کلمه`, full: "حکایت کامل", excerpt: "برشی از",
-      gj: "متن در گنجور", gut: "متن در پروژه گوتنبرگ", ws: "متن در ویکی‌نبشته", related: "موضوع‌های مرتبط:",
+      gj: "متن در گنجور", gut: "متن در پروژه گوتنبرگ", ws: "متن در ویکی‌نبشته", wq: "متن در ویکی‌گفتاورد", copy: "© گزیدهٔ کوتاه برای نقل‌قول؛ حق نشر محفوظ است", via: "نقل از", related: "موضوع‌های مرتبط:",
       try: "پیشنهاد:", sugg: ["عشق", "دوستی", "مرگ", "دریا", "پادشاه", "روباه", "دروغ", "شب", "طمع", "خاموشی"],
-      newTab: "(در زبانهٔ تازه)", total: n => `${num(n)} حکایت کوتاه از گلستان سعدی و بهارستان جامی`
+      newTab: "(در زبانهٔ تازه)", total: n => `${num(n)} داستان و حکایت کوتاه — از گلستان و کلیله و دمنه و هزار و یک شب تا هدایت و بهرنگی و معروفی و ترجمهٔ نویسندگان جهان`
     },
     en: {
       searching: "Searching…", loading: "Getting the stories ready…",
       found: (i, n, q) => `Story ${i} of ${n} for “${esc(q)}”`,
       none: q => `No story matched “${esc(q)}”. Try one of these themes, or read a random story:`,
       random: "A random story", words: n => `${n} words`, full: "Complete text", excerpt: "Excerpt from",
-      gj: "Read on Ganjoor", gut: "Read on Project Gutenberg", ws: "Read on Wikisource", related: "Related themes:",
+      gj: "Read on Ganjoor", gut: "Read on Project Gutenberg", ws: "Read on Wikisource", wq: "Read on Wikiquote", copy: "© short quoted excerpt; the work is under copyright", via: "quoted via", related: "Related themes:",
       try: "Try:", sugg: ["love", "friendship", "death", "sea", "fox", "king", "greed", "night", "truth", "hope"],
-      newTab: "(opens in a new tab)", total: n => `${n} public-domain short stories and fables`
+      newTab: "(opens in a new tab)", total: n => `${n} short stories, fables and excerpts — from Aesop and Chekhov to Borges, Munro and Murakami`
     }
   };
   const t = () => S[L()];
@@ -112,6 +112,13 @@
     ["غرور", "pride", "غرور تکبر کبر خودپسند", "pride proud vain vanity arrogant"],
     ["طنز", "humour", "مطایبه ظریف خنده", "humour humor funny joke satire laugh"],
     ["جانوران", "animals", "شیر روباه گرگ سگ گربه موش مار شتر اسب خر درازگوش کلاغ زاغ مرغ گوسفند مور بز گاو", "animal beast fox lion wolf dog cat mouse snake camel horse ass crow bird sheep ant goat ox bull"],
+    ["سرنوشت", "fate", "سرنوشت تقدیر قضا بخت اقبال", "fate destiny fortune luck doom"],
+    ["زمان", "time", "زمان روزگار ساعت لحظه عمر گذشته", "time hour moment memory past years clock"],
+    ["تنهایی", "loneliness", "تنها تنهایی غریب غربت انزوا", "alone lonely loneliness solitude exile stranger"],
+    ["شهر", "city", "شهر بازار کوچه خیابان محله", "city town street market village"],
+    ["کتاب", "books", "کتاب کتابخانه نامه خواندن نوشتن قصه", "book library read reading write writer story letter"],
+    ["کودکی", "childhood", "کودک بچه کودکی دبستان مدرسه بازی", "child children childhood school play little"],
+    ["جادو", "magic", "جادو پری دیو جن طلسم سحر", "magic witch fairy giant spell enchanted ghost"],
     ["طبیعت", "nature", "درخت باغ گل بستان بوستان کوه باران ابر", "tree garden flower rose mountain rain cloud forest"]
   ];
   // word-level dictionary so a single word also crosses languages (fox → روباه …)
@@ -119,7 +126,7 @@
     ["خر درازگوش", "ass donkey"], ["کلاغ زاغ", "crow raven"], ["مرغ پرنده", "bird hen"], ["گوسفند میش", "sheep lamb"], ["مور مورچه", "ant"], ["گاو", "ox bull cow"], ["بز", "goat"],
     ["درخت", "tree oak"], ["آفتاب خورشید", "sun"], ["ماه", "moon"], ["آب", "water"], ["نان", "bread"], ["زر طلا", "gold"], ["دزد", "thief robber"], ["طبیب پزشک", "doctor physician"],
     ["بازرگان", "merchant"], ["خواب", "sleep dream"], ["گل", "flower rose"], ["باغ", "garden"], ["کوه", "mountain"], ["زن", "woman wife"], ["مادر", "mother"], ["پدر", "father"],
-    ["چشم", "eye"], ["دل", "heart"], ["دست", "hand"], ["سنگ", "stone rock"], ["آتش", "fire"], ["باد", "wind"], ["کشتی", "ship boat"], ["شب", "night"], ["روز", "day"], ["خانه", "house home"]];
+    ["چشم", "eye"], ["دل", "heart"], ["دست", "hand"], ["سنگ", "stone rock"], ["آتش", "fire"], ["باد", "wind"], ["کشتی", "ship boat"], ["شب", "night"], ["روز", "day"], ["خانه", "house home"], ["پرنده", "bird"], ["ماهی", "fish"], ["فیل", "elephant"], ["خرگوش", "hare rabbit"], ["لاک‌پشت سنگ‌پشت", "tortoise turtle"], ["کبوتر", "dove pigeon"], ["جنگل", "forest wood"], ["قلب", "heart"], ["آینه", "mirror"], ["عکس", "photograph picture"]];
   let CONC = null; // built lazily: [{fa, en, keys:Set(all variants of keys), lab:{fa,en}}]
   function buildConcepts() {
     CONC = [];
@@ -139,7 +146,7 @@
     const name = lang === "fa" ? "STORIES_FA" : "STORIES_EN";
     if (window[name]) return Promise.resolve(DATA[lang] = window[name]);
     return new Promise((res, rej) => {
-      const s = document.createElement("script"); s.src = `stories-${lang}.js?v=1`; s.async = true;
+      const s = document.createElement("script"); s.src = `stories-${lang}.js?v=20261102`; s.async = true;
       s.onload = () => res(DATA[lang] = window[name]); s.onerror = rej; document.head.appendChild(s);
     });
   }
@@ -155,9 +162,9 @@
       const meta = new Set(); tokens([st.t, st.a, st.w, st.ch || "", st.tr || ""].join(" ")).forEach(w => keyOf(w).v.forEach(x => meta.add(x)));
       const conc = new Set();
       CONC.forEach((c, ci) => { for (const v of c.keys) if (vars.has(v) || meta.has(v)) { conc.add(ci); break; } });
-      if ((st.ch && st.ch.includes("مطایبه")) || st.a === "Ambrose Bierce") conc.add(CONC.findIndex(c => c.lab.en === "humour"));
-      if (/حیوانات/.test(st.ch || "") || st.a === "Aesop") conc.add(CONC.findIndex(c => c.lab.en === "animals"));
-      const prio = st.a === "Ambrose Bierce" || st.w === "بهارستان" ? 0.92 : 1;
+      if ((st.ch && st.ch.includes("مطایبه")) || /Ambrose Bierce|عبید/.test(st.a)) conc.add(CONC.findIndex(c => c.lab.en === "humour"));
+      if (/حیوانات/.test(st.ch || "") || /^(Aesop|Brothers Grimm|نصرالله منشی|سعدالدین وراوینی)$/.test(st.a) || /Fables|کلیله|مرزبان/.test(st.w)) conc.add(CONC.findIndex(c => c.lab.en === "animals"));
+      const prio = 1;
       return { st, cnt, vars, list: [...new Set(list)], meta, conc, prio };
     });
     return IDX[lang];
@@ -194,6 +201,10 @@
       res.push({ it, score: score * it.prio + Math.random() * 0.01 });
     });
     res.sort((a, b) => b.score - a.score);
+    // spread authors: each further story by the same author counts a little less, so one prolific source can't fill the top
+    const seen = new Map();
+    res.forEach(r => { const k = seen.get(r.it.st.a) || 0; seen.set(r.it.st.a, k + 1); r.score *= Math.pow(0.75, k); });
+    res.sort((a, b) => b.score - a.score);
     return { qs, qc, res };
   }
 
@@ -212,24 +223,25 @@
     }).join("");
   }
   const wordCount = st => st.parts.reduce((n, p) => n + p.slice(1).join(" ").split(/\s+/).filter(Boolean).length, 0);
-  function linkLabel(u) { return /ganjoor/.test(u) ? t().gj : /wikisource/.test(u) ? t().ws : t().gut; }
+  function linkLabel(u) { return /ganjoor/.test(u) ? t().gj : /wikisource/.test(u) ? t().ws : /wikiquote/.test(u) ? t().wq : t().gut; }
   function renderStory(st, qs, qc) {
     const lang = L(), x = t();
     const isFa = lang === "fa";
     const bodyHtml = st.parts.map(p => p[0] === "b"
       ? `<div class="st-beyt"><span>${markHtml(p[1], qs, qc)}</span>${p[2] ? `<span>${markHtml(p[2], qs, qc)}</span>` : ""}</div>`
       : `<p>${markHtml(p[1], qs, qc)}</p>`).join("");
-    const where = isFa ? `${esc(st.w)}، ${esc(st.ch)}، ${esc(st.t)}` : `<i>${esc(st.w)}</i>${st.w !== st.t ? ` — “${esc(st.t)}”` : ""}${st.tr ? `, ${esc(st.tr)}` : ""}`;
+    const where = isFa ? [st.w, st.ch, st.w !== st.t ? st.t : ""].filter(Boolean).map(esc).join("، ") + (st.tr ? `، ${esc(st.tr)}` : "") : `<i>${esc(st.w)}</i>${st.w !== st.t ? ` — “${esc(st.t)}”` : ""}${st.tr ? `, ${esc(st.tr)}` : ""}`;
     els.result.innerHTML = `
       <header class="st-head">
         <span class="st-badge${st.x ? " ex" : ""}">${st.x ? x.excerpt : x.full}</span>
-        <h2 id="stStoryTitle">${st.x ? `${esc(x.excerpt)} “${esc(st.t)}”` : esc(isFa ? st.t : st.t)}</h2>
+        <h2 id="stStoryTitle">${st.x ? (isFa ? `${esc(x.excerpt)} «${esc(st.t)}»` : `${esc(x.excerpt)} “${esc(st.t)}”`) : esc(st.t)}</h2>
       </header>
       <div class="st-text" lang="${lang}" dir="${isFa ? "rtl" : "ltr"}">${bodyHtml}</div>
       <footer class="st-cite">
         <div class="st-who"><b>${esc(st.a)}</b> <span class="st-dash">—</span> ${where}</div>
-        <div class="st-meta"><span>${esc(st.y)}</span><span class="dot"></span><span>${x.words(wordCount(st))}</span><span class="dot"></span>
+        <div class="st-meta">${st.y ? `<span>${esc(st.y)}</span><span class="dot"></span>` : ""}<span>${x.words(wordCount(st))}</span><span class="dot"></span>
           <a href="${esc(st.u)}" target="_blank" rel="noopener">${linkLabel(st.u)} <span class="sr-only">${x.newTab}</span><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+        ${st.c ? `<div class="st-copy">${x.copy}${st.pub ? ` — ${esc(st.pub)}` : ""}</div>` : ""}
       </footer>`;
     els.result.classList.remove("hidden"); els.result.classList.remove("pop"); void els.result.offsetWidth; els.result.classList.add("pop");
     els.actions.classList.remove("hidden");

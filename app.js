@@ -61,7 +61,7 @@
       kbRemapped: "⌨️ صفحه‌کلید روی انگلیسی است", caps: "Caps Lock روشن است",
       menu: "منو", menuTitle: "تایپ پارسی", close: "بستن منو", navType: "تمرین تایپ", navStories: "داستان کوتاه پیدا کن",
       sbNote: "حکایت‌های کوتاه سعدی و جامی، با ذکر منبع از گنجور", storyLabel: "داستان",
-      stTitle: "داستان کوتاه پیدا کن", stSub: "هر کلمه‌ای که دوست دارید بنویسید؛ یک داستان کوتاهِ حداکثر صدکلمه‌ای از گلستان سعدی یا بهارستان جامی، با ذکر منبع، پیدا می‌کنیم.",
+      stTitle: "داستان کوتاه پیدا کن", stSub: "هر کلمه‌ای که دوست دارید بنویسید؛ یک داستان یا حکایتِ کوتاهِ حداکثر صدکلمه‌ای — از ادبیات کهن و معاصر فارسی و ترجمهٔ نویسندگان جهان — با ذکر منبع پیدا می‌کنیم.",
       stLabel: "کلمه‌ای برای جست‌وجو", stPh: "مثلاً عشق، دریا، روباه، دوستی…", stGo: "بگرد",
       stAnother: "داستان دیگر", stRandom: "تصادفی", stType: "این داستان را تایپ کن"
     },
@@ -84,7 +84,7 @@
       caps: "⇪ Caps Lock is on",
       menu: "Menu", menuTitle: "Parsi Type", close: "Close menu", navType: "Typing practice", navStories: "Find a short story",
       sbNote: "Classic short fables & stories, with sources", storyLabel: "story",
-      stTitle: "Find a short story", stSub: "Type any word and get a short story of 100 words or fewer by a famous author, with its source.",
+      stTitle: "Find a short story", stSub: "Type any word and get a short story of 100 words or fewer — classic or contemporary, from writers around the world — with its source.",
       stLabel: "Word to search for", stPh: "e.g. love, sea, fox, friendship…", stGo: "Search",
       stAnother: "Another story", stRandom: "Random", stType: "Type this story"
     }
