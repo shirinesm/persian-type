@@ -58,7 +58,12 @@
       liveWpm: "ک/د", sec: " ثانیه", pct: "٪", modeTime: "زمان ", lens: { short: "متن کوتاه", medium: "متن متوسط", long: "متن بلند" },
       q: ["«", "»"], sepWho: "، ",
       kbWrong: "⌨️ صفحه‌کلید روی <b>انگلیسی</b> است؛ آن را <b>فارسی</b> کنید <span>(گوشی: دکمهٔ 🌐 · رایانه: <bdi dir=ltr>Alt+Shift</bdi> یا <bdi dir=ltr>⌘+Space</bdi>)</span>",
-      kbRemapped: "⌨️ صفحه‌کلید روی انگلیسی است", caps: "Caps Lock روشن است"
+      kbRemapped: "⌨️ صفحه‌کلید روی انگلیسی است", caps: "Caps Lock روشن است",
+      menu: "منو", menuTitle: "تایپ پارسی", close: "بستن منو", navType: "تمرین تایپ", navStories: "داستان کوتاه پیدا کن",
+      sbNote: "حکایت‌های کوتاه سعدی و جامی، با ذکر منبع از گنجور", storyLabel: "داستان",
+      stTitle: "داستان کوتاه پیدا کن", stSub: "هر کلمه‌ای که دوست دارید بنویسید؛ یک داستان کوتاهِ حداکثر صدکلمه‌ای از گلستان سعدی یا بهارستان جامی، با ذکر منبع، پیدا می‌کنیم.",
+      stLabel: "کلمه‌ای برای جست‌وجو", stPh: "مثلاً عشق، دریا، روباه، دوستی…", stGo: "بگرد",
+      stAnother: "داستان دیگر", stRandom: "تصادفی", stType: "این داستان را تایپ کن"
     },
     en: {
       title: "Parsi Type | Typing practice with English literature & philosophy",
@@ -76,7 +81,12 @@
       q: ["“", "”"], sepWho: ", ",
       kbWrong: "⌨️ Your keyboard is set to <b>Persian</b>. Switch it to <b>English</b> <span>(phone: 🌐 key · computer: Alt+Shift or ⌘+Space)</span>",
       kbRemapped: "⌨️ Your keyboard is set to Persian, so keys are being read as English (QWERTY). <span>Switch to English for best results.</span>",
-      caps: "⇪ Caps Lock is on"
+      caps: "⇪ Caps Lock is on",
+      menu: "Menu", menuTitle: "Parsi Type", close: "Close menu", navType: "Typing practice", navStories: "Find a short story",
+      sbNote: "Classic short fables & stories, with sources", storyLabel: "story",
+      stTitle: "Find a short story", stSub: "Type any word and get a short story of 100 words or fewer by a famous author, with its source.",
+      stLabel: "Word to search for", stPh: "e.g. love, sea, fox, friendship…", stGo: "Search",
+      stAnother: "Another story", stRandom: "Random", stType: "Type this story"
     }
   };
   let lang = document.documentElement.lang === "en" ? "en" : "fa";
@@ -110,6 +120,9 @@
   let target = "", segments = [], typed = "";
   let total = 0, correctKeys = 0, startTime = 0, tick = null, running = false, finished = false;
   let lastPick = -1;
+  let custom = null; // داستانی که از بخش «داستان کوتاه پیدا کن» برای تایپ انتخاب شده
+  const mode = () => custom ? "passage" : cfg.mode;
+  const storyMode = () => document.body.classList.contains("story-mode") || document.body.classList.contains("sb-open");
   let samples = [], lastSampleSec = 0, errSince = 0;
   const reduceMotion = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -263,9 +276,9 @@
     clearInterval(tick); tick = null; running = false; finished = false;
     typed = ""; total = 0; correctKeys = 0; startTime = 0; input.value = ""; composing = false; wrongScript = 0; remapped = false;
     samples = []; lastSampleSec = 0; errSince = 0;
-    setTarget(cfg.mode === "time" ? buildTimeMode() : buildPassageMode());
+    setTarget(custom ? [custom] : cfg.mode === "time" ? buildTimeMode() : buildPassageMode());
     render(); wordsEl.style.transform = ""; placeCaret();
-    timerEl.textContent = cfg.mode === "time" ? num(cfg.time) : ""; liveWpmEl.textContent = "";
+    timerEl.textContent = mode() === "time" ? num(cfg.time) : ""; liveWpmEl.textContent = "";
     showView("test");
     wrap.classList.remove("typing"); updateWarn();
     focusInput();
@@ -275,7 +288,7 @@
     running = true; startTime = performance.now();
     tick = setInterval(() => {
       const t = elapsed();
-      if (cfg.mode === "time") {
+      if (mode() === "time") {
         const left = Math.max(0, Math.ceil(cfg.time - t));
         timerEl.textContent = num(left);
         if (t >= cfg.time) finish();
@@ -356,17 +369,17 @@
     updateWarn();
     wrap.classList.add("typing"); clearTimeout(onInput.t); onInput.t = setTimeout(() => wrap.classList.remove("typing"), 600);
     if (!composing) caretToEnd();
-    if (cfg.mode === "time" && typed.length > target.length - 150) {
+    if (mode() === "time" && typed.length > target.length - 150) {
       const next = POOL[Math.floor(Math.random() * POOL.length)];
       appendSegment(next, true); placeCaret();
     }
-    if (cfg.mode === "passage" && typed.length === target.length) finish();
+    if (mode() === "passage" && typed.length === target.length) finish();
   }
 
   function finish() {
     if (finished) return;
     finished = true; running = false; clearInterval(tick);
-    const sec = cfg.mode === "time" ? Math.min(elapsed(), cfg.time) : elapsed();
+    const sec = mode() === "time" ? Math.min(elapsed(), cfg.time) : elapsed();
     const acc = total ? Math.round((correctKeys / total) * 100) : 0;
     sample(sec);
     if (sec - lastSampleSec > .3 || !samples.length) samples.push({ s: sec, wpm: wpm(sec), raw: Math.round((typed.length / 5) / (Math.max(sec, .001) / 60)), err: errSince });
@@ -374,7 +387,7 @@
     countUp($("rAcc"), acc, T().pct);
     $("rChars").textContent = num(correctChars()) + " / " + num(typed.length - correctChars());
     $("rTime").textContent = num(Math.round(sec)) + T().sec;
-    $("rMode").textContent = cfg.mode === "time" ? T().modeTime + num(cfg.time) : T().lens[cfg.len];
+    $("rMode").textContent = custom ? T().storyLabel : cfg.mode === "time" ? T().modeTime + num(cfg.time) : T().lens[cfg.len];
     const reached = segments.filter(s => s.start < Math.max(1, typed.length));
     $("attrib").innerHTML = "";
     reached.forEach(s => {
@@ -431,7 +444,7 @@
     svg.innerHTML = `<defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9c46a" stop-opacity=".35"/><stop offset="1" stop-color="#e9c46a" stop-opacity="0"/></linearGradient></defs>
       ${grid}<path d="${area}" fill="url(#ga)" class="ar"/><path d="${line("raw")}" class="r"/><path d="${line("wpm")}" class="w" pathLength="1"/>${errs}`;
   }
-  function focusInput() { input.focus({ preventScroll: true }); wrap.classList.remove("blurred"); }
+  function focusInput() { if (storyMode()) return; input.focus({ preventScroll: true }); wrap.classList.remove("blurred"); }
   input.addEventListener("blur", () => wrap.classList.add("blurred"));
   input.addEventListener("focus", () => wrap.classList.remove("blurred"));
   // textarea شفاف روی متن قرار دارد تا لمس متن در موبایل (iOS) مستقیماً صفحه‌کلید را باز کند.
@@ -460,6 +473,7 @@
     if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) e.preventDefault();
   });
   document.addEventListener("keydown", e => {
+    if (storyMode()) return; // در بخش داستان‌ها و منوی کناری، کلیدها کار عادی خود را می‌کنند
     if (e.key === "Tab" || e.key === "Enter") { e.preventDefault(); reset(); return; }
     if (e.key === "Escape") { if (running) finish(); return; }
     if (!finished && document.activeElement !== input && e.key.length === 1 && !e.ctrlKey && !e.metaKey) focusInput();
@@ -478,7 +492,7 @@
     if (b.dataset.mode) cfg.mode = b.dataset.mode;
     if (b.dataset.time) cfg.time = +b.dataset.time;
     if (b.dataset.len) cfg.len = b.dataset.len;
-    saveCfg(); syncButtons(); reset(); b.blur();
+    custom = null; saveCfg(); syncButtons(); reset(); b.blur();
   });
   $("restartBtn").addEventListener("click", reset);
   $("againBtn").addEventListener("click", reset);
@@ -490,6 +504,7 @@
     document.title = t.title; $("metaDesc").setAttribute("content", t.desc);
     document.querySelectorAll("[data-i18n]").forEach(el => { el.innerHTML = t[el.dataset.i18n]; });
     document.querySelectorAll("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t[el.dataset.i18nAria]));
+    document.querySelectorAll("[data-i18n-ph]").forEach(el => el.setAttribute("placeholder", t[el.dataset.i18nPh]));
     document.querySelectorAll("[data-i18n-title]").forEach(el => el.setAttribute("title", t[el.dataset.i18nTitle]));
     document.querySelectorAll("[data-num]").forEach(el => { el.textContent = num(+el.dataset.num); });
     input.setAttribute("dir", lang === "en" ? "ltr" : "rtl");
@@ -497,6 +512,7 @@
     document.querySelectorAll("#langToggle [data-lang]").forEach(b => { const on = b.dataset.lang === lang; b.classList.toggle("active", on); b.setAttribute("aria-pressed", on); });
     $("langToggle").dataset.active = lang;
     POOL = POOLS[lang]; lastPick = -1;
+    document.dispatchEvent(new CustomEvent("ptype:lang", { detail: lang }));
     if (save) {
       try { localStorage.setItem("ptype-lang", lang); } catch (e) {}
       try { const u = new URL(location.href); u.searchParams.set("lang", lang); history.replaceState(null, "", u); } catch (e) {}
@@ -504,7 +520,7 @@
   }
   function setLang(l) {
     if (l === lang) return;
-    lang = l; applyLang(true); reset();
+    lang = l; custom = null; applyLang(true); reset();
   }
   $("langToggle").addEventListener("click", e => {
     const b = e.target.closest("[data-lang]"); if (!b) return;
@@ -515,6 +531,12 @@
     applyLang(fromUrl === "en" || fromUrl === "fa");
   })();
 
-  window.__ptype = { get target() { return target; }, get words() { return words; }, get lang() { return lang; }, setLang, normalizeText, matches, finish, reset, cfg };
+  // «این داستان را تایپ کن»: یک متن دلخواه به‌جای گزیده‌های تصادفی (تا تغییر تنظیمات یا زبان)
+  function typeStory(p) {
+    const text = lang === "fa" ? normalizeText(p.text) : p.text.replace(/\s+/g, " ").trim();
+    custom = { id: -2, text, author: p.author, source: p.source };
+    reset();
+  }
+  window.__ptype = { get target() { return target; }, get words() { return words; }, get lang() { return lang; }, get custom() { return custom; }, setLang, normalizeText, matches, finish, reset, typeStory, cfg };
   syncButtons(); reset();
 })();

@@ -45,6 +45,9 @@ if(!en)sc.querySelectorAll("[data-src]").forEach(function(i){i.src=i.getAttribut
 </script>
 
 <header>
+  <button id="menuBtn" class="menu-btn" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="منو" data-i18n-aria="menu">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h11M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
   <a class="brand" href="./" aria-label="تایپ پارسی" data-i18n-aria="brand">
     <img class="mark" src="assets/mark.svg" alt="" width="40" height="40">
     <span class="logo" data-i18n="logo">تایپ <b>پارسی</b></span>
@@ -73,6 +76,29 @@ if(!en)sc.querySelectorAll("[data-src]").forEach(function(i){i.src=i.getAttribut
   </div>
 </header>
 
+<div id="scrim" class="scrim" aria-hidden="true"></div>
+<aside id="sidebar" aria-label="منو" data-i18n-aria="menu" aria-hidden="true" inert>
+  <div class="sb-head">
+    <img src="assets/mark.svg" alt="" width="34" height="34">
+    <span class="sb-title" data-i18n="menuTitle">تایپ پارسی</span>
+    <button id="sbClose" class="sb-close" type="button" aria-label="بستن منو" data-i18n-aria="close">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <nav class="sb-nav">
+    <a href="./" class="sb-item current" data-nav="type" aria-current="page">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6 10h.01M9.5 10h.01M13 10h.01M16.5 10h.01M7.5 14h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span data-i18n="navType">تمرین تایپ</span>
+    </a>
+    <a href="#stories" class="sb-item" data-nav="stories">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="17.5" cy="3.2" r="1" fill="currentColor"/></svg>
+      <span data-i18n="navStories">داستان کوتاه پیدا کن</span>
+    </a>
+  </nav>
+  <div class="sb-art" aria-hidden="true"><img class="sb-simurgh" src="assets/simurgh.svg" alt="" loading="lazy"><div class="sb-swirl"></div></div>
+  <p class="sb-note" data-i18n="sbNote">حکایت‌های کوتاه سعدی و جامی، با ذکر منبع از گنجور</p>
+</aside>
+
 <main>
   <section id="test" class="view">
     <div class="card typing-card">
@@ -90,6 +116,30 @@ if(!en)sc.querySelectorAll("[data-src]").forEach(function(i){i.src=i.getAttribut
     <button id="restartBtn" class="icon-btn" title="شروع دوباره (Tab)" aria-label="شروع دوباره" data-i18n-title="restartTitle" data-i18n-aria="restart">
       <svg viewBox="0 0 24 24" width="22" height="22"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
+  </section>
+
+  <section id="storyView" class="view hidden" aria-labelledby="stTitle">
+    <div class="card story-card">
+      <h1 id="stTitle" data-i18n="stTitle">داستان کوتاه پیدا کن</h1>
+      <p class="st-sub" data-i18n="stSub">هر کلمه‌ای که دوست دارید بنویسید.</p>
+      <form id="stForm" role="search" autocomplete="off">
+        <label for="stQ" class="sr-only" data-i18n="stLabel">کلمه‌ای برای جست‌وجو</label>
+        <div class="st-field">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="stQ" type="search" enterkeyhint="search" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="80" placeholder="مثلاً عشق، دریا، روباه، دوستی…" data-i18n-ph="stPh">
+        </div>
+        <button type="submit" class="primary st-go" data-i18n="stGo">بگرد</button>
+      </form>
+      <div id="stChips" class="st-chips"></div>
+      <div id="stStatus" class="st-status" role="status" aria-live="polite"></div>
+      <article id="stResult" class="st-result hidden" tabindex="-1" aria-labelledby="stStoryTitle"></article>
+      <div id="stActions" class="st-actions hidden">
+        <button id="stAnother" type="button" class="st-btn"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 7h11l-3-3M20 17H9l3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="stAnother">داستان دیگر</span></button>
+        <button id="stRandom" type="button" class="st-btn"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="15" r="1.3" fill="currentColor"/><circle cx="15" cy="9" r="1.3" fill="currentColor"/><circle cx="9" cy="15" r="1.3" fill="currentColor"/></svg><span data-i18n="stRandom">تصادفی</span></button>
+        <button id="stType" type="button" class="primary st-type"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7.5 14h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span data-i18n="stType">این داستان را تایپ کن</span></button>
+      </div>
+      <p id="stCount" class="st-count"></p>
+    </div>
   </section>
 
   <section id="result" class="view hidden">
@@ -121,6 +171,7 @@ if(!en)sc.querySelectorAll("[data-src]").forEach(function(i){i.src=i.getAttribut
 <script src="texts.js"></script>
 <script src="texts-en.js"></script>
 <script src="app.js"></script>
+<script src="stories.js"></script>
 <script src="bg.js" defer></script>
 </body>
 </html>
