@@ -59,7 +59,7 @@
       q: ["«", "»"], sepWho: "، ",
       kbWrong: "⌨️ صفحه‌کلید روی <b>انگلیسی</b> است؛ آن را <b>فارسی</b> کنید <span>(گوشی: دکمهٔ 🌐 · رایانه: <bdi dir=ltr>Alt+Shift</bdi> یا <bdi dir=ltr>⌘+Space</bdi>)</span>",
       kbRemapped: "⌨️ صفحه‌کلید روی انگلیسی است", caps: "Caps Lock روشن است",
-      menu: "منو", menuTitle: "تایپ پارسی", close: "بستن منو", navType: "تمرین تایپ", navStories: "داستان کوتاه پیدا کن",
+      menu: "منو", menuTitle: "تایپ پارسی", close: "بستن منو", navType: "تمرین تایپ", navStories: "داستان کوتاه پیدا کن", navLearn: "آموزش تایپ ده‌انگشتی",
       sbNote: "حکایت‌های کوتاه سعدی و جامی، با ذکر منبع از گنجور", storyLabel: "داستان",
       stTitle: "داستان کوتاه پیدا کن", stSub: "هر کلمه‌ای که دوست دارید بنویسید؛ یک داستان یا حکایتِ کوتاهِ حداکثر صدکلمه‌ای — از ادبیات کهن و معاصر فارسی و ترجمهٔ نویسندگان جهان — با ذکر منبع پیدا می‌کنیم.",
       stLabel: "کلمه‌ای برای جست‌وجو", stPh: "مثلاً عشق، دریا، روباه، دوستی…", stGo: "بگرد",
@@ -82,7 +82,7 @@
       kbWrong: "⌨️ Your keyboard is set to <b>Persian</b>. Switch it to <b>English</b> <span>(phone: 🌐 key · computer: Alt+Shift or ⌘+Space)</span>",
       kbRemapped: "⌨️ Your keyboard is set to Persian, so keys are being read as English (QWERTY). <span>Switch to English for best results.</span>",
       caps: "⇪ Caps Lock is on",
-      menu: "Menu", menuTitle: "Parsi Type", close: "Close menu", navType: "Typing practice", navStories: "Find a short story",
+      menu: "Menu", menuTitle: "Parsi Type", close: "Close menu", navType: "Typing practice", navStories: "Find a short story", navLearn: "Learn touch typing",
       sbNote: "Classic short fables & stories, with sources", storyLabel: "story",
       stTitle: "Find a short story", stSub: "Type any word and get a short story of 100 words or fewer — classic or contemporary, from writers around the world — with its source.",
       stLabel: "Word to search for", stPh: "e.g. love, sea, fox, friendship…", stGo: "Search",
@@ -122,7 +122,7 @@
   let lastPick = -1;
   let custom = null; // داستانی که از بخش «داستان کوتاه پیدا کن» برای تایپ انتخاب شده
   const mode = () => custom ? "passage" : cfg.mode;
-  const storyMode = () => document.body.classList.contains("story-mode") || document.body.classList.contains("sb-open");
+  const storyMode = () => document.body.classList.contains("story-mode") || document.body.classList.contains("learn-mode") || document.body.classList.contains("sb-open");
   let samples = [], lastSampleSec = 0, errSince = 0;
   const reduceMotion = () => window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
