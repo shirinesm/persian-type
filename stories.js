@@ -317,34 +317,52 @@
     els.scrim.classList.remove("on"); els.menu.setAttribute("aria-expanded", "false"); body.classList.remove("sb-open");
     if (restore !== false && lastFocus && lastFocus.focus) lastFocus.focus();
   }
-  function setRoute(stories, push) {
-    const was = body.classList.contains("story-mode");
-    body.classList.toggle("story-mode", stories);
-    els.sb.querySelectorAll(".sb-item").forEach(a => { const on = (a.dataset.nav === "stories") === stories; a.classList.toggle("current", on); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
-    if (push) { try { const u = new URL(location.href); u.hash = stories ? "stories" : ""; history.pushState(null, "", u.href.replace(/#$/, "")); } catch (e) {} }
-    if (stories) {
+  // مسیریابی سه‌حالته: "type" | "stories" | "learn"
+  // (سازگار با قبل: true یعنی stories و false یعنی type)
+  function setRoute(mode, push) {
+    if (mode === true) mode = "stories";
+    if (mode === false) mode = "type";
+    const wasStories = body.classList.contains("story-mode");
+    const wasLearn = body.classList.contains("learn-mode");
+    body.classList.toggle("story-mode", mode === "stories");
+    body.classList.toggle("learn-mode", mode === "learn");
+    els.sb.querySelectorAll(".sb-item").forEach(a => { const on = a.dataset.nav === mode; a.classList.toggle("current", on); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
+    if (push) { try { const u = new URL(location.href); u.hash = mode === "type" ? "" : mode; history.pushState(null, "", u.href.replace(/#$/, "")); } catch (e) {} }
+    const learnView = $("learnView");
+    if (mode === "stories") {
       $("test").classList.add("hidden"); $("result").classList.add("hidden");
+      if (learnView) learnView.classList.add("hidden");
       els.view.classList.remove("hidden"); els.view.classList.remove("enter"); void els.view.offsetWidth; els.view.classList.add("enter");
       ensure();
-      if (!was) { if (!els.result.innerHTML) showSuggestions(); }
-    } else if (was) {
+      if (!wasStories) { if (!els.result.innerHTML) showSuggestions(); }
+    } else if (mode === "learn") {
+      $("test").classList.add("hidden"); $("result").classList.add("hidden");
       els.view.classList.add("hidden");
+      if (learnView) { learnView.classList.remove("hidden"); learnView.classList.remove("enter"); void learnView.offsetWidth; learnView.classList.add("enter"); }
+      if (window.__learn) window.__learn.open();
+    } else if (wasStories || wasLearn) {
+      els.view.classList.add("hidden");
+      if (learnView) learnView.classList.add("hidden");
       if (window.__ptype) window.__ptype.reset();
     }
   }
-  function goStories(push) { closeSidebar(false); setRoute(true, push); setTimeout(() => els.q.focus({ preventScroll: true }), 60); }
-  function goTyping(push) { closeSidebar(false); setRoute(false, push); }
+  function goStories(push) { closeSidebar(false); setRoute("stories", push); setTimeout(() => els.q.focus({ preventScroll: true }), 60); }
+  function goTyping(push) { closeSidebar(false); setRoute("type", push); }
+  function goLearn(push) { closeSidebar(false); setRoute("learn", push); }
 
   function init() {
     Object.assign(els, { sb: $("sidebar"), scrim: $("scrim"), menu: $("menuBtn"), view: $("storyView"), q: $("stQ"), form: $("stForm"),
       chips: $("stChips"), status: $("stStatus"), result: $("stResult"), actions: $("stActions"), another: $("stAnother"), count: $("stCount") });
     els.view.addEventListener("animationend", e => { if (e.target === els.view) els.view.classList.remove("enter"); });
+    const lv = $("learnView"); if (lv) lv.addEventListener("animationend", e => { if (e.target === lv) lv.classList.remove("enter"); });
     els.menu.addEventListener("click", () => els.sb.classList.contains("open") ? closeSidebar() : openSidebar());
     $("sbClose").addEventListener("click", () => closeSidebar());
     els.scrim.addEventListener("click", () => closeSidebar());
     els.sb.addEventListener("click", e => {
       const a = e.target.closest(".sb-item"); if (!a) return; e.preventDefault();
-      a.dataset.nav === "stories" ? goStories(true) : goTyping(true);
+      if (a.dataset.nav === "stories") goStories(true);
+      else if (a.dataset.nav === "learn") goLearn(true);
+      else goTyping(true);
     });
     document.addEventListener("keydown", e => {
       if (!els.sb.classList.contains("open")) return;
@@ -375,7 +393,7 @@
       goTyping(true);
       window.__ptype.typeStory({ text: text.replace(/\s+/g, " ").trim(), author: st.a, source });
     });
-    window.addEventListener("popstate", () => { location.hash === "#stories" ? setRoute(true) : setRoute(false); });
+    window.addEventListener("popstate", () => { location.hash === "#stories" ? setRoute("stories") : location.hash === "#learn" ? setRoute("learn") : setRoute("type"); });
     document.addEventListener("ptype:lang", () => {
       ready = null; els.count.textContent = "";
       if (body.classList.contains("story-mode")) {
@@ -383,8 +401,9 @@
       } else { els.result.innerHTML = ""; els.result.classList.add("hidden"); els.actions.classList.add("hidden"); els.status.textContent = ""; state = { q: "", res: [], i: 0, qs: [], qc: [] }; }
       if (!state.q) els.q.value = "";
     });
-    if (location.hash === "#stories") setRoute(true);
+    if (location.hash === "#stories") setRoute("stories");
+    else if (location.hash === "#learn") setRoute("learn");
   }
-  window.__stories = { search: (q, lang) => ensure().then(() => search(lang || L(), q).res.map(r => r.it.st)), load, open: () => goStories(true) };
+  window.__stories = { search: (q, lang) => ensure().then(() => search(lang || L(), q).res.map(r => r.it.st)), load, open: () => goStories(true), goTyping, goLearn };
   init();
 })();
